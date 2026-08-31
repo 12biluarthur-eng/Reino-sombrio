@@ -1482,6 +1482,16 @@ function drawEnemies(){
    enemy.type==="orcBoss"?10:7
   );
 
+ctx.fillStyle="#fff";
+ctx.font="bold 10px Arial";
+ctx.textAlign="center";
+
+ctx.fillText(
+    Math.ceil(enemy.hp)+" / "+Math.ceil(enemy.maxHp),
+    enemy.x,
+    barY-4
+);
+  
   if(enemy.type!=="slime"){
 
    ctx.fillStyle="#fff";

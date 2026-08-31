@@ -1,376 +1,464 @@
-<!DOCTYPE html><html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#171021">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.json"><title>Reino Sombrio</title><style>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<title>Reino Sombrio</title>
+
+<style>
 *{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    user-select:none;
-    -webkit-user-select:none;
-    -webkit-tap-highlight-color:transparent;
+ box-sizing:border-box;
+ margin:0;
+ padding:0;
+ user-select:none;
+ -webkit-user-select:none;
+ -webkit-tap-highlight-color:transparent;
 }
 
 html,body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#315d38;
-    touch-action:none;
-    font-family:Arial,sans-serif;
+ width:100%;
+ height:100%;
+ overflow:hidden;
+ background:#315d38;
+ touch-action:none;
+ font-family:Arial,sans-serif;
 }
 
 canvas{
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
+ position:fixed;
+ inset:0;
+ width:100%;
+ height:100%;
 }
 
 button{
-    touch-action:manipulation;
+ touch-action:manipulation;
 }
 
-/* HUD */
-
 #hud{
-    position:fixed;
-    top:8px;
-    left:8px;
-    width:210px;
-    padding:9px;
-    color:#fff;
-    background:rgba(0,0,0,.75);
-    border-radius:12px;
-    z-index:20;
-    font-size:13px;
+ position:fixed;
+ top:8px;
+ left:8px;
+ width:215px;
+ padding:9px;
+ color:#fff;
+ background:rgba(0,0,0,.75);
+ border-radius:12px;
+ z-index:20;
+ font-size:13px;
 }
 
 .bar{
-    width:100%;
-    height:10px;
-    margin:3px 0 5px;
-    background:#222;
-    border-radius:8px;
-    overflow:hidden;
+ width:100%;
+ height:10px;
+ margin:3px 0 5px;
+ background:#222;
+ border-radius:8px;
+ overflow:hidden;
 }
 
-#hpBar{
-    width:100%;
-    height:100%;
-    background:#e53935;
-}
-
-#xpBar{
-    width:0%;
-    height:100%;
-    background:#2196f3;
-}
+#hpBar{height:100%;background:#e53935}
+#xpBar{height:100%;background:#2196f3}
 
 #waveText{
-    color:#ffd54f;
-    font-weight:bold;
+ color:#ffd54f;
+ font-weight:bold;
 }
-
-/* INVENTÁRIO */
 
 #inventoryButton{
-    position:fixed;
-    right:10px;
-    top:10px;
-    width:56px;
-    height:56px;
-    border:0;
-    border-radius:12px;
-    background:rgba(0,0,0,.8);
-    color:white;
-    font-size:28px;
-    z-index:30;
+ position:fixed;
+ right:10px;
+ top:10px;
+ width:56px;
+ height:56px;
+ border:0;
+ border-radius:12px;
+ background:rgba(0,0,0,.8);
+ color:white;
+ font-size:28px;
+ z-index:30;
 }
 
-#inventory{
-    display:none;
-    position:fixed;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    width:min(94vw,390px);
-    padding:15px;
-    background:#18151d;
-    border:2px solid #9b59b6;
-    border-radius:18px;
-    color:white;
-    z-index:100;
-    box-shadow:0 10px 40px #000;
+#inventory,#characters,#missions{
+ display:none;
+ position:fixed;
+ left:50%;
+ top:50%;
+ transform:translate(-50%,-50%);
+ width:min(94vw,430px);
+ max-height:90vh;
+ overflow:auto;
+ padding:18px;
+ background:#18151d;
+ border:2px solid #9b59b6;
+ border-radius:18px;
+ color:white;
+ z-index:300;
+ box-shadow:0 10px 40px #000;
 }
 
-#inventory h2{
-    text-align:center;
-    margin-bottom:12px;
+#inventory h2,#characters h2,#missions h2{
+ text-align:center;
+ margin-bottom:14px;
 }
 
 #slots{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:8px;
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:8px;
 }
 
 .slot{
-    height:82px;
-    border:2px solid #555;
-    border-radius:10px;
-    background:#222;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    font-size:26px;
+ height:82px;
+ border:2px solid #555;
+ border-radius:10px;
+ background:#222;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ font-size:26px;
 }
 
 .slot.empty{
-    color:#555;
+ color:#555;
 }
 
 .slot small{
-    font-size:10px;
-    line-height:13px;
-    color:#ddd;
+ font-size:10px;
+ line-height:13px;
+ color:#ddd;
 }
 
 #stats{
-    margin-top:12px;
-    padding:9px;
-    background:rgba(255,255,255,.06);
-    border-radius:10px;
-    font-size:12px;
-    line-height:18px;
+ margin-top:12px;
+ padding:9px;
+ background:rgba(255,255,255,.06);
+ border-radius:10px;
+ font-size:12px;
+ line-height:18px;
 }
 
-#closeInventory{
-    width:100%;
-    margin-top:12px;
-    padding:11px;
-    border:0;
-    border-radius:10px;
-    background:#8e44ad;
-    color:white;
-    font-size:16px;
+.closeButton{
+ width:100%;
+ margin-top:12px;
+ padding:11px;
+ border:0;
+ border-radius:10px;
+ background:#8e44ad;
+ color:white;
+ font-size:16px;
 }
 
-/* JOYSTICK */
+.characterCard,.missionCard{
+ background:#25212b;
+ border:2px solid #555;
+ border-radius:13px;
+ padding:12px;
+ margin:9px 0;
+}
+
+.characterCard h3{
+ margin-bottom:6px;
+}
+
+.locked{
+ opacity:.55;
+}
+
+.unlocked{
+ border-color:#42c95a;
+}
+
+.characterSelect{
+ width:100%;
+ margin-top:8px;
+ padding:9px;
+ border:0;
+ border-radius:8px;
+ background:#9b59b6;
+ color:white;
+}
+
+.characterSelect:disabled{
+ background:#444;
+}
+
+.missionCard{
+ font-size:13px;
+ line-height:20px;
+}
+
+.missionDone{
+ border-color:#42c95a;
+}
 
 #joystick{
-    position:fixed;
-    left:18px;
-    bottom:18px;
-    width:140px;
-    height:140px;
-    border-radius:50%;
-    background:rgba(255,255,255,.13);
-    border:3px solid rgba(255,255,255,.3);
-    z-index:30;
+ position:fixed;
+ left:18px;
+ bottom:18px;
+ width:140px;
+ height:140px;
+ border-radius:50%;
+ background:rgba(255,255,255,.13);
+ border:3px solid rgba(255,255,255,.3);
+ z-index:30;
 }
 
 #stick{
-    position:absolute;
-    left:39px;
-    top:39px;
-    width:56px;
-    height:56px;
-    border-radius:50%;
-    background:rgba(255,255,255,.72);
+ position:absolute;
+ left:39px;
+ top:39px;
+ width:56px;
+ height:56px;
+ border-radius:50%;
+ background:rgba(255,255,255,.72);
 }
 
-/* ATAQUE */
-
 #attackButton{
-    position:fixed;
-    right:20px;
-    bottom:25px;
-    width:92px;
-    height:92px;
-    border:0;
-    border-radius:50%;
-    background:#c0392b;
-    color:white;
-    font-size:34px;
-    z-index:30;
-    box-shadow:0 5px 18px rgba(0,0,0,.5);
+ position:fixed;
+ right:20px;
+ bottom:25px;
+ width:92px;
+ height:92px;
+ border:0;
+ border-radius:50%;
+ background:#c0392b;
+ color:white;
+ font-size:34px;
+ z-index:30;
+ box-shadow:0 5px 18px rgba(0,0,0,.5);
 }
 
 #attackButton:active{
-    transform:scale(.92);
+ transform:scale(.92);
 }
-
-/* POÇÃO */
 
 #potionButton{
-    position:fixed;
-    right:125px;
-    bottom:125px;
-    width:62px;
-    height:62px;
-    border:0;
-    border-radius:50%;
-    background:#2980b9;
-    color:white;
-    font-size:25px;
-    z-index:30;
+ position:fixed;
+ right:125px;
+ bottom:125px;
+ width:62px;
+ height:62px;
+ border:0;
+ border-radius:50%;
+ background:#2980b9;
+ color:white;
+ font-size:25px;
+ z-index:30;
 }
-
-/* MENSAGEM */
 
 #message{
-    position:fixed;
-    left:50%;
-    bottom:6px;
-    transform:translateX(-50%);
-    padding:6px 10px;
-    border-radius:8px;
-    background:rgba(0,0,0,.65);
-    color:white;
-    font-size:11px;
-    z-index:25;
-    pointer-events:none;
+ position:fixed;
+ left:50%;
+ bottom:6px;
+ transform:translateX(-50%);
+ padding:6px 10px;
+ border-radius:8px;
+ background:rgba(0,0,0,.65);
+ color:white;
+ font-size:11px;
+ z-index:25;
+ pointer-events:none;
 }
 
-/* TELAS */
-
 .screen{
-    position:fixed;
-    inset:0;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    color:white;
-    background:radial-gradient(circle,#603574,#090909 75%);
-    z-index:200;
+ position:fixed;
+ inset:0;
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ align-items:center;
+ text-align:center;
+ color:white;
+ background:radial-gradient(circle,#603574,#090909 75%);
+ z-index:200;
 }
 
 .screen h1{
-    font-size:38px;
-    margin-bottom:12px;
+ font-size:38px;
+ margin-bottom:12px;
 }
 
 .screen p{
-    margin:5px 20px;
+ margin:5px 20px;
 }
 
 .menuButton{
-    margin-top:25px;
-    padding:15px 42px;
-    border:0;
-    border-radius:12px;
-    background:#9b59b6;
-    color:white;
-    font-size:20px;
+ margin-top:14px;
+ padding:15px 42px;
+ width:230px;
+ border:0;
+ border-radius:12px;
+ background:#9b59b6;
+ color:white;
+ font-size:20px;
 }
 
 #waveScreen{
-    display:none;
-    position:fixed;
-    inset:0;
-    z-index:150;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    color:white;
-    background:rgba(5,5,8,.9);
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:150;
+ flex-direction:column;
+ justify-content:center;
+ align-items:center;
+ text-align:center;
+ color:white;
+ background:rgba(5,5,8,.9);
 }
 
 #waveScreen h1{
-    color:#ffd54f;
-    font-size:38px;
-    margin-bottom:10px;
+ color:#ffd54f;
+ font-size:38px;
+ margin-bottom:10px;
 }
-</style></head><body><canvas id="game"></canvas>
+</style>
+</head>
+
+<body>
+
+<canvas id="game"></canvas>
 
 <div id="hud">
-    <b id="levelText">⚔️ Nível 1</b><br><br>❤️ Vida
-<div class="bar">
-    <div id="hpBar"></div>
-</div>
+<b id="levelText">⚔️ Nível 1</b><br><br>
+❤️ Vida
+<div class="bar"><div id="hpBar"></div></div>
 
 ⭐ XP
-<div class="bar">
-    <div id="xpBar"></div>
-</div>
+<div class="bar"><div id="xpBar"></div></div>
 
 ⚔️ Ataque: <span id="attackText">10</span><br>
 🛡️ Defesa: <span id="defenseText">0</span><br>
-🧪 Poções: <span id="potionText">3</span><br><br>
+🧪 Poções: <span id="potionText">3</span><br>
+👤 <span id="characterText">Ruan</span><br><br>
 
 <span id="waveText">🌊 Horda 1</span><br>
 👹 Restantes: <span id="enemyCount">0</span>
+</div>
 
-</div><button id="inventoryButton">🎒</button>
+<button id="inventoryButton">🎒</button>
 
 <div id="inventory">
-    <h2>🎒 Inventário</h2>
-    <div id="slots"></div>
-    <div id="stats"></div>
-    <button id="closeInventory">FECHAR</button>
-</div><div id="joystick">
-    <div id="stick"></div>
-</div><button id="attackButton">⚔️</button>
+<h2>🎒 Inventário</h2>
+<div id="slots"></div>
+<div id="stats"></div>
+<button class="closeButton" onclick="closePanel('inventory')">FECHAR</button>
+</div>
+
+<div id="characters">
+<h2>👤 PERSONAGENS</h2>
+<div id="characterList"></div>
+<button class="closeButton" onclick="closePanel('characters')">FECHAR</button>
+</div>
+
+<div id="missions">
+<h2>📜 MISSÕES</h2>
+<div id="missionList"></div>
+<button class="closeButton" onclick="closePanel('missions')">FECHAR</button>
+</div>
+
+<div id="joystick">
+<div id="stick"></div>
+</div>
+
+<button id="attackButton">⚔️</button>
 <button id="potionButton">🧪</button>
 
-<div id="message">Derrote todos os monstros!</div><div id="menu" class="screen">
-    <h1>⚔️ Reino Sombrio</h1>
-    <p>Sobreviva às hordas!</p>
-    <p>Derrote monstros e consiga equipamentos.</p>
-    <button id="playButton" class="menuButton">JOGAR</button>
-</div><div id="waveScreen">
-    <h1 id="waveTitle">🌊 HORDA LIMPA!</h1>
-    <p id="waveDescription">Prepare-se...</p>
-</div><div id="gameOver" class="screen" style="display:none">
-    <h1>💀 VOCÊ MORREU</h1>
-    <p id="result">Nível 1</p>
-    <button id="restartButton" class="menuButton">
-        JOGAR NOVAMENTE
-    </button>
-</div><script>
+<div id="message">Derrote todos os monstros!</div>
+
+<div id="menu" class="screen">
+<h1>⚔️ Reino Sombrio</h1>
+<p>Sobreviva às hordas!</p>
+<button id="playButton" class="menuButton">JOGAR</button>
+<button id="charactersButton" class="menuButton">PERSONAGENS</button>
+<button id="missionsButton" class="menuButton">MISSÕES</button>
+</div>
+
+<div id="waveScreen">
+<h1 id="waveTitle">🌊 HORDA LIMPA!</h1>
+<p>Prepare-se...</p>
+</div>
+
+<div id="gameOver" class="screen" style="display:none">
+<h1>💀 VOCÊ MORREU</h1>
+<p id="result">Nível 1</p>
+<button id="restartButton" class="menuButton">JOGAR NOVAMENTE</button>
+</div>
+
+<script>
 "use strict";
 
 const canvas=document.getElementById("game");
 const ctx=canvas.getContext("2d");
 
-let W=innerWidth;
-let H=innerHeight;
+let W=innerWidth,H=innerHeight;
 
 function resize(){
-    W=innerWidth;
-    H=innerHeight;
-    canvas.width=W;
-    canvas.height=H;
+ W=innerWidth;
+ H=innerHeight;
+ canvas.width=W;
+ canvas.height=H;
 }
-
 addEventListener("resize",resize);
 resize();
 
-/* PLAYER */
+/* ================= PERSONAGENS ================= */
+
+const characters={
+ Ruan:{
+  name:"Ruan",
+  icon:"🧑",
+  description:"Personagem inicial. Não possui poderes.",
+  unlocked:true,
+  attack:10,
+  maxHp:100,
+  speed:4
+ },
+
+ Alicia:{
+  name:"Alicia",
+  icon:"⚔️",
+  description:"Espadachim. Possui +10 de força e uma arma mais forte.",
+  unlocked:false,
+  attack:20,
+  maxHp:100,
+  speed:4.2
+ },
+
+ Josef:{
+  name:"Josef",
+  icon:"🧙",
+  description:"Mago. +20 de vida e cajado que lança magia azul à distância.",
+  unlocked:false,
+  attack:10,
+  maxHp:120,
+  speed:3.8
+ }
+};
+
+let selectedCharacter=localStorage.getItem("selectedCharacter")||"Ruan";
+
+let saveData=JSON.parse(
+ localStorage.getItem("reinoSombrioSave")||"{}"
+);
+
+if(saveData.alicia)characters.Alicia.unlocked=true;
+if(saveData.josef)characters.Josef.unlocked=true;
+
+/* ================= JOGADOR ================= */
 
 const player={
-    x:0,
-    y:0,
-    radius:19,
-    speed:4,
-    hp:100,
-    maxHp:100,
-    level:1,
-    xp:0,
-    nextXP:50,
-    attack:10,
-    defense:0,
-    potions:3,
-    attackCooldown:0
+ x:0,y:0,radius:19,speed:4,
+ hp:100,maxHp:100,
+ level:1,xp:0,nextXP:50,
+ attack:10,defense:0,potions:3,
+ attackCooldown:0
 };
 
 let playing=false;
@@ -383,1250 +471,1230 @@ let drops=[];
 let particles=[];
 let inventory=[];
 
-/* ITENS */
-
 const itemTypes=[
-    {name:"Espada",icon:"🗡️",type:"attack",value:3},
-    {name:"Machado",icon:"🪓",type:"attack",value:7},
-    {name:"Armadura",icon:"🛡️",type:"defense",value:3},
-    {name:"Capacete",icon:"⛑️",type:"defense",value:2},
-    {name:"Coração",icon:"❤️",type:"health",value:15},
-    {name:"Botas",icon:"👢",type:"speed",value:.25}
+ {name:"Espada",icon:"🗡️",type:"attack",value:3},
+ {name:"Machado",icon:"🪓",type:"attack",value:7},
+ {name:"Armadura",icon:"🛡️",type:"defense",value:3},
+ {name:"Capacete",icon:"⛑️",type:"defense",value:2},
+ {name:"Coração",icon:"❤️",type:"health",value:15},
+ {name:"Botas",icon:"👢",type:"speed",value:.25},
+
+ {name:"Alho",icon:"🧄",type:"garlic",value:1},
+ {name:"Meteoro",icon:"☄️",type:"meteor",value:25},
+ {name:"Bíblia",icon:"📖",type:"bible",value:5}
 ];
 
-/* INVENTÁRIO */
+/* ================= MENU ================= */
+
+function openPanel(id){
+ document.getElementById(id).style.display="block";
+}
+
+function closePanel(id){
+ document.getElementById(id).style.display="none";
+}
+
+document.getElementById("charactersButton").addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ renderCharacters();
+ openPanel("characters");
+});
+
+document.getElementById("missionsButton").addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ renderMissions();
+ openPanel("missions");
+});
+
+/* ================= PERSONAGENS ================= */
+
+function renderCharacters(){
+
+ const box=document.getElementById("characterList");
+ box.innerHTML="";
+
+ for(const key of Object.keys(characters)){
+
+  const c=characters[key];
+
+  const card=document.createElement("div");
+  card.className="characterCard "+(c.unlocked?"unlocked":"locked");
+
+  let status=c.unlocked?"✅ DESBLOQUEADO":"🔒 BLOQUEADO";
+
+  card.innerHTML=
+   "<h3>"+c.icon+" "+c.name+"</h3>"+
+   "<p>"+c.description+"</p>"+
+   "<p>"+status+"</p>";
+
+  const button=document.createElement("button");
+  button.className="characterSelect";
+  button.textContent=
+   selectedCharacter===key
+   ?"EQUIPADO"
+   :"ESCOLHER";
+
+  button.disabled=!c.unlocked;
+
+  button.onclick=()=>{
+   selectedCharacter=key;
+   localStorage.setItem("selectedCharacter",key);
+   renderCharacters();
+   showMessage("👤 "+c.name+" selecionado!");
+  };
+
+  card.appendChild(button);
+  box.appendChild(card);
+ }
+}
+
+/* ================= MISSÕES ================= */
+
+function missionStatus(condition){
+ return condition?"✅ CONCLUÍDA":"🔒 NÃO CONCLUÍDA";
+}
+
+function renderMissions(){
+
+ const box=document.getElementById("missionList");
+
+ const m5=wave>=5 || saveData.wave5;
+ const m10=wave>=10 || saveData.wave10;
+ const orc25=saveData.orc25;
+
+ box.innerHTML="";
+
+ const missions=[
+  {
+   title:"🌊 Chegue à 5ª horda",
+   progress:Math.min(wave,5)+"/5",
+   done:m5,
+   reward:"Recompensa: progresso"
+  },
+  {
+   title:"⚔️ Chegue à 10ª horda",
+   progress:Math.min(wave,10)+"/10",
+   done:m10,
+   reward:"Recompensa: Alicia"
+  },
+  {
+   title:"👹 Mate o Chefe Orc na horda 25",
+   progress:orc25?"1/1":"0/1",
+   done:orc25,
+   reward:"Recompensa: Josef"
+  }
+ ];
+
+ for(const m of missions){
+
+  const card=document.createElement("div");
+  card.className="missionCard "+(m.done?"missionDone":"");
+
+  card.innerHTML=
+   "<b>"+m.title+"</b><br>"+
+   "Progresso: "+m.progress+"<br>"+
+   missionStatus(m.done)+"<br>"+
+   m.reward;
+
+  box.appendChild(card);
+ }
+}
+
+/* ================= INVENTÁRIO ================= */
 
 function bonusName(type){
-    if(type==="attack")return"ATQ";
-    if(type==="defense")return"DEF";
-    if(type==="health")return"VIDA";
-    if(type==="speed")return"VEL";
-    return"";
+ if(type==="attack")return"ATQ";
+ if(type==="defense")return"DEF";
+ if(type==="health")return"VIDA";
+ if(type==="speed")return"VEL";
+ if(type==="garlic")return"ÁREA";
+ if(type==="meteor")return"DANO";
+ if(type==="bible")return"DANO";
+ return"";
 }
 
 function renderInventory(){
 
-    const slots=document.getElementById("slots");
-    slots.innerHTML="";
+ const slots=document.getElementById("slots");
+ slots.innerHTML="";
 
-    for(let i=0;i<6;i++){
+ for(let i=0;i<9;i++){
 
-        const slot=document.createElement("div");
-        slot.className="slot";
+  const slot=document.createElement("div");
+  slot.className="slot";
 
-        if(inventory[i]){
+  if(inventory[i]){
 
-            const item=inventory[i];
+   const item=inventory[i];
 
-            slot.innerHTML=
-                item.icon+
-                "<small>"+
-                item.name+
-                "<br>+"+
-                item.value+
-                " "+
-                bonusName(item.type)+
-                "</small>";
+   slot.innerHTML=
+    item.icon+
+    "<small>"+item.name+
+    "<br>"+bonusName(item.type)+
+    (item.type==="meteor"||item.type==="bible"
+     ?" "+item.value:" +"+item.value)+
+    "</small>";
 
-        }else{
+  }else{
+   slot.classList.add("empty");
+   slot.textContent="—";
+  }
 
-            slot.classList.add("empty");
-            slot.textContent="—";
-        }
+  slots.appendChild(slot);
+ }
 
-        slots.appendChild(slot);
-    }
+ document.getElementById("stats").innerHTML=
+  "<b>📊 Atributos</b><br>"+
+  "⚔️ Ataque: "+player.attack+"<br>"+
+  "🛡️ Defesa: "+player.defense+"<br>"+
+  "❤️ Vida máxima: "+player.maxHp+"<br>"+
+  "👢 Velocidade: "+player.speed.toFixed(2)+"<br>"+
+  "🧄 Alhos: "+countItem("garlic")+"<br>"+
+  "☄️ Meteoros: "+countItem("meteor")+"<br>"+
+  "📖 Livros: "+countItem("bible");
+}
 
-    document.getElementById("stats").innerHTML=
-        "<b>📊 Atributos</b><br>"+
-        "⚔️ Ataque: "+player.attack+"<br>"+
-        "🛡️ Defesa: "+player.defense+"<br>"+
-        "❤️ Vida máxima: "+player.maxHp+"<br>"+
-        "👢 Velocidade: "+player.speed.toFixed(2);
+function countItem(type){
+ return inventory.filter(i=>i.type===type).length;
 }
 
 function collectItem(item){
 
-    if(inventory.length>=6){
-        showMessage("🎒 Inventário cheio!");
-        return;
-    }
+ if(inventory.length>=9){
+  showMessage("🎒 Inventário cheio!");
+  return;
+ }
 
-    inventory.push(item);
+ inventory.push({...item});
 
-    if(item.type==="attack")player.attack+=item.value;
+ if(item.type==="attack")player.attack+=item.value;
+ if(item.type==="defense")player.defense+=item.value;
 
-    if(item.type==="defense")player.defense+=item.value;
+ if(item.type==="health"){
+  player.maxHp+=item.value;
+  player.hp+=item.value;
+ }
 
-    if(item.type==="health"){
-        player.maxHp+=item.value;
-        player.hp+=item.value;
-    }
+ if(item.type==="speed")player.speed+=item.value;
 
-    if(item.type==="speed")player.speed+=item.value;
-
-    particle(player.x,player.y,item.icon+" "+item.name);
-
-    showMessage("🎒 Pegou: "+item.name);
-
-    renderInventory();
+ particle(player.x,player.y,item.icon);
+ showMessage("🎒 Pegou: "+item.name);
+ renderInventory();
 }
 
-function openInventory(){
-    renderInventory();
-    document.getElementById("inventory").style.display="block";
-}
-
-function closeInventory(){
-    document.getElementById("inventory").style.display="none";
-}
-
-document.getElementById("inventoryButton").addEventListener(
-    "pointerdown",
-    e=>{
-        e.preventDefault();
-        openInventory();
-    }
-);
-
-document.getElementById("closeInventory").addEventListener(
-    "pointerdown",
-    e=>{
-        e.preventDefault();
-        closeInventory();
-    }
-);
-
-/* DROP */
+/* ================= DROPS ================= */
 
 function createDrop(x,y){
 
-    if(Math.random()>.25)return;
+ if(Math.random()>.22)return;
 
-    const item=
-        itemTypes[
-            Math.floor(Math.random()*itemTypes.length)
-        ];
+ const item=itemTypes[
+  Math.floor(Math.random()*itemTypes.length)
+ ];
 
-    drops.push({
-        x:x,
-        y:y,
-        item:item,
-        life:900
-    });
+ drops.push({
+  x:x,
+  y:y,
+  item:item,
+  life:900
+ });
 }
 
-/* JOYSTICK */
+/* ================= JOYSTICK ================= */
 
 const joystick=document.getElementById("joystick");
 const stick=document.getElementById("stick");
 
-let joyX=0;
-let joyY=0;
+let joyX=0,joyY=0;
 let joystickActive=false;
 let joystickPointer=null;
 
 function updateJoystick(x,y){
 
-    const rect=joystick.getBoundingClientRect();
+ const rect=joystick.getBoundingClientRect();
 
-    const cx=rect.left+rect.width/2;
-    const cy=rect.top+rect.height/2;
+ const cx=rect.left+rect.width/2;
+ const cy=rect.top+rect.height/2;
 
-    let dx=x-cx;
-    let dy=y-cy;
+ let dx=x-cx;
+ let dy=y-cy;
 
-    const max=42;
-    const distance=Math.hypot(dx,dy);
+ const max=42;
+ const distance=Math.hypot(dx,dy);
 
-    if(distance>max){
-        dx=dx/distance*max;
-        dy=dy/distance*max;
-    }
+ if(distance>max){
+  dx=dx/distance*max;
+  dy=dy/distance*max;
+ }
 
-    joyX=dx/max;
-    joyY=dy/max;
+ joyX=dx/max;
+ joyY=dy/max;
 
-    stick.style.left=(42+dx-28)+"px";
-    stick.style.top=(42+dy-28)+"px";
+ stick.style.left=(42+dx-28)+"px";
+ stick.style.top=(42+dy-28)+"px";
 }
 
 function resetJoystick(){
 
-    joystickActive=false;
-    joystickPointer=null;
+ joystickActive=false;
+ joystickPointer=null;
+ joyX=0;
+ joyY=0;
 
-    joyX=0;
-    joyY=0;
-
-    stick.style.left="39px";
-    stick.style.top="39px";
+ stick.style.left="39px";
+ stick.style.top="39px";
 }
 
 joystick.addEventListener("pointerdown",e=>{
-
-    e.preventDefault();
-
-    joystickActive=true;
-    joystickPointer=e.pointerId;
-
-    updateJoystick(e.clientX,e.clientY);
+ e.preventDefault();
+ joystickActive=true;
+ joystickPointer=e.pointerId;
+ updateJoystick(e.clientX,e.clientY);
 });
 
 joystick.addEventListener("pointermove",e=>{
-
-    if(!joystickActive)return;
-    if(e.pointerId!==joystickPointer)return;
-
-    e.preventDefault();
-
-    updateJoystick(e.clientX,e.clientY);
+ if(!joystickActive||e.pointerId!==joystickPointer)return;
+ e.preventDefault();
+ updateJoystick(e.clientX,e.clientY);
 });
 
 joystick.addEventListener("pointerup",resetJoystick);
 joystick.addEventListener("pointercancel",resetJoystick);
 
-/* ATAQUE */
+/* ================= ATAQUE ================= */
 
-document.getElementById("attackButton").addEventListener(
-    "pointerdown",
-    e=>{
-        e.preventDefault();
-        attack();
-    }
-);
+document.getElementById("attackButton").addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ attack();
+});
 
 function attack(){
 
-    if(!playing)return;
-    if(waveTransition)return;
-    if(player.attackCooldown>0)return;
+ if(!playing||waveTransition||player.attackCooldown>0)return;
 
-    player.attackCooldown=22;
+ player.attackCooldown=22;
 
-    let closest=null;
-    let closestDistance=Infinity;
+ if(selectedCharacter==="Josef"){
+  magicAttack();
+  return;
+ }
 
-    for(const enemy of enemies){
+ let closest=null;
+ let closestDistance=Infinity;
 
-        const distance=Math.hypot(
-            player.x-enemy.x,
-            player.y-enemy.y
-        );
+ for(const enemy of enemies){
+  const d=Math.hypot(player.x-enemy.x,player.y-enemy.y);
 
-        if(distance<closestDistance){
-            closestDistance=distance;
-            closest=enemy;
-        }
-    }
+  if(d<closestDistance){
+   closestDistance=d;
+   closest=enemy;
+  }
+ }
 
-    if(closest && closestDistance<=100){
+ if(closest&&closestDistance<=110){
+  damageEnemy(closest,player.attack);
+ }else{
+  particle(player.x+35,player.y,"⚔️");
+ }
 
-        closest.hp-=player.attack;
-
-        particle(
-            closest.x,
-            closest.y,
-            "-"+player.attack
-        );
-
-        if(closest.hp<=0){
-
-            createDrop(closest.x,closest.y);
-            gainXP(closest.xp);
-
-            particle(
-                closest.x,
-                closest.y,
-                "+"+closest.xp+" XP"
-            );
-
-            const index=enemies.indexOf(closest);
-
-            if(index>=0)enemies.splice(index,1);
-        }
-
-    }else{
-
-        particle(
-            player.x+35,
-            player.y,
-            "⚔️"
-        );
-    }
-
-    checkWaveClear();
+ checkWaveClear();
 }
 
-/* POÇÃO */
+function damageEnemy(enemy,damage){
 
-document.getElementById("potionButton").addEventListener(
-    "pointerdown",
-    e=>{
-        e.preventDefault();
-        usePotion();
-    }
-);
+ enemy.hp-=damage;
+
+ particle(enemy.x,enemy.y,"-"+damage);
+
+ if(enemy.hp<=0){
+
+  if(enemy.type==="orcBoss"&&wave===25){
+   saveData.orc25=true;
+   localStorage.setItem("reinoSombrioSave",JSON.stringify(saveData));
+   characters.Josef.unlocked=true;
+   showMessage("🎉 JOSEF DESBLOQUEADO!");
+  }
+
+  createDrop(enemy.x,enemy.y);
+  gainXP(enemy.xp);
+
+  const index=enemies.indexOf(enemy);
+  if(index>=0)enemies.splice(index,1);
+ }
+}
+
+/* ================= MAGIA DO JOSEF ================= */
+
+function magicAttack(){
+
+ let closest=null;
+ let closestDistance=Infinity;
+
+ for(const enemy of enemies){
+
+  const d=Math.hypot(
+   player.x-enemy.x,
+   player.y-enemy.y
+  );
+
+  if(d<closestDistance){
+   closestDistance=d;
+   closest=enemy;
+  }
+ }
+
+ if(!closest)return;
+
+ const angle=Math.atan2(
+  closest.y-player.y,
+  closest.x-player.x
+ );
+
+ particles.push({
+  x:player.x,
+  y:player.y,
+  vx:Math.cos(angle)*7,
+  vy:Math.sin(angle)*7,
+  life:70,
+  text:"🔵",
+  magic:true
+ });
+}
+
+/* ================= POÇÃO ================= */
+
+document.getElementById("potionButton").addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ usePotion();
+});
 
 function usePotion(){
 
-    if(!playing)return;
+ if(!playing)return;
 
-    if(player.potions<=0){
-        showMessage("❌ Sem poções!");
-        return;
-    }
+ if(player.potions<=0){
+  showMessage("❌ Sem poções!");
+  return;
+ }
 
-    if(player.hp>=player.maxHp){
-        showMessage("❤️ Vida cheia!");
-        return;
-    }
+ if(player.hp>=player.maxHp){
+  showMessage("❤️ Vida cheia!");
+  return;
+ }
 
-    player.potions--;
+ player.potions--;
+ player.hp=Math.min(player.maxHp,player.hp+45);
 
-    player.hp=Math.min(
-        player.maxHp,
-        player.hp+45
-    );
-
-    particle(
-        player.x,
-        player.y,
-        "+45 ❤️"
-    );
+ particle(player.x,player.y,"+45 ❤️");
 }
 
-/* JOGO */
+/* ================= JOGO ================= */
 
 function startGame(){
 
-    document.getElementById("menu").style.display="none";
-    document.getElementById("gameOver").style.display="none";
-    document.getElementById("waveScreen").style.display="none";
+ document.getElementById("menu").style.display="none";
+ document.getElementById("gameOver").style.display="none";
+ document.getElementById("waveScreen").style.display="none";
 
-    player.x=W/2;
-    player.y=H/2;
+ const c=characters[selectedCharacter];
 
-    player.hp=100;
-    player.maxHp=100;
-    player.level=1;
-    player.xp=0;
-    player.nextXP=50;
-    player.attack=10;
-    player.defense=0;
-    player.speed=4;
-    player.potions=3;
-    player.attackCooldown=0;
+ player.x=W/2;
+ player.y=H/2;
 
-    inventory=[];
-    enemies=[];
-    drops=[];
-    particles=[];
+ player.hp=c.maxHp;
+ player.maxHp=c.maxHp;
+ player.level=1;
+ player.xp=0;
+ player.nextXP=50;
+ player.attack=c.attack;
+ player.defense=0;
+ player.speed=c.speed;
+ player.potions=3;
+ player.attackCooldown=0;
 
-    wave=1;
-    waveTransition=false;
-    playing=true;
+ inventory=[];
+ enemies=[];
+ drops=[];
+ particles=[];
 
-    startWave();
+ wave=1;
+ waveTransition=false;
+ playing=true;
 
-    lastTime=performance.now();
+ startWave();
 
-    requestAnimationFrame(gameLoop);
+ lastTime=performance.now();
+ requestAnimationFrame(gameLoop);
 }
 
-document.getElementById("playButton").addEventListener(
-    "pointerdown",
-    e=>{
-        e.preventDefault();
-        startGame();
-    }
-);
+document.getElementById("playButton").addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ startGame();
+});
 
-document.getElementById("restartButton").addEventListener(
-    "pointerdown",
-    e=>{
-        e.preventDefault();
-        startGame();
-    }
-);
+document.getElementById("restartButton").addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ startGame();
+});
 
-/* HORDA */
+/* ================= HORDAS ================= */
 
 function startWave(){
 
-    enemies=[];
-    drops=[];
+ enemies=[];
+ drops=[];
 
-    const amount=5+wave*2;
+ const amount=5+wave*2;
 
-    for(let i=0;i<amount;i++){
-        createEnemy();
-    }
+ for(let i=0;i<amount;i++){
+  createEnemy();
+ }
 
-    showMessage(
-        "🌊 Horda "+wave+" começou!"
-    );
-
-    updateHUD();
+ showMessage("🌊 Horda "+wave+" começou!");
+ updateHUD();
 }
 
-/* MONSTROS */
+/* ================= MONSTROS ================= */
 
 function createEnemy(){
 
-    const angle=Math.random()*Math.PI*2;
+ const angle=Math.random()*Math.PI*2;
+ const distance=Math.max(W,H)*.55+Math.random()*180;
 
-    const distance=
-        Math.max(W,H)*.55+
-        Math.random()*180;
+ let type="slime";
 
-    let type="slime";
+ if(player.level>=5&&Math.random()<.4)type="orc";
+ if(player.level>=10&&Math.random()<.3)type="demon";
 
-    if(player.level>=5 && Math.random()<.4){
-        type="orc";
-    }
+ /*
+  * O CHEFE ORC aparece obrigatoriamente
+  * na horda 25.
+  */
+ if(wave===25&&enemies.length===0){
+  type="orcBoss";
+ }
 
-    if(player.level>=10 && Math.random()<.3){
-        type="demon";
-    }
+ const enemy={
+  x:player.x+Math.cos(angle)*distance,
+  y:player.y+Math.sin(angle)*distance,
+  type:type,
+  size:28,
+  hp:30,
+  maxHp:30,
+  speed:1,
+  damage:5,
+  xp:15,
+  color:"#8e44ad",
+  name:"Slime",
+  cooldown:0
+ };
 
-    if(
-        player.level>=15 &&
-        wave%5===0 &&
-        Math.random()<.12
-    ){
-        type="boss";
-    }
+ if(type==="slime"){
+  enemy.maxHp=Math.floor(30+wave*12);
+  enemy.hp=enemy.maxHp;
+  enemy.speed=1+wave*.025;
+  enemy.damage=4+wave;
+  enemy.xp=15+wave*4;
+  enemy.color="#8e44ad";
+  enemy.name="Slime";
+ }
 
-    const enemy={
-        x:player.x+Math.cos(angle)*distance,
-        y:player.y+Math.sin(angle)*distance,
-        type:type,
-        size:28,
-        hp:30,
-        maxHp:30,
-        speed:1,
-        damage:5,
-        xp:15,
-        color:"#8e44ad",
-        name:"Slime",
-        cooldown:0
-    };
+ if(type==="orc"){
+  enemy.size=38;
+  enemy.maxHp=Math.floor(90+wave*25);
+  enemy.hp=enemy.maxHp;
+  enemy.speed=.75;
+  enemy.damage=8+wave*2;
+  enemy.xp=35+wave*5;
+  enemy.color="#557a3e";
+  enemy.name="Orc";
+ }
 
-    if(type==="slime"){
+ if(type==="demon"){
+  enemy.size=45;
+  enemy.maxHp=Math.floor(170+wave*40);
+  enemy.hp=enemy.maxHp;
+  enemy.speed=1.05;
+  enemy.damage=13+wave*2;
+  enemy.xp=70+wave*8;
+  enemy.color="#c0392b";
+  enemy.name="Demônio";
+ }
 
-        enemy.maxHp=Math.floor(30+wave*12);
-        enemy.hp=enemy.maxHp;
-        enemy.speed=1+wave*.025;
-        enemy.damage=4+wave;
-        enemy.xp=15+wave*4;
-        enemy.color="#8e44ad";
-        enemy.name="Slime";
-    }
+ if(type==="orcBoss"){
+  enemy.size=82;
+  enemy.maxHp=1800;
+  enemy.hp=1800;
+  enemy.speed=.55;
+  enemy.damage=28;
+  enemy.xp=600;
+  enemy.color="#254b20";
+  enemy.name="👑 CHEFE ORC";
+ }
 
-    if(type==="orc"){
-
-        enemy.size=38;
-        enemy.maxHp=Math.floor(90+wave*25);
-        enemy.hp=enemy.maxHp;
-        enemy.speed=.75;
-        enemy.damage=8+wave*2;
-        enemy.xp=35+wave*5;
-        enemy.color="#557a3e";
-        enemy.name="Orc";
-    }
-
-    if(type==="demon"){
-
-        enemy.size=45;
-        enemy.maxHp=Math.floor(170+wave*40);
-        enemy.hp=enemy.maxHp;
-        enemy.speed=1.05;
-        enemy.damage=13+wave*2;
-        enemy.xp=70+wave*8;
-        enemy.color="#c0392b";
-        enemy.name="Demônio";
-    }
-
-    if(type==="boss"){
-
-        enemy.size=70;
-        enemy.maxHp=Math.floor(700+wave*180);
-        enemy.hp=enemy.maxHp;
-        enemy.speed=.55;
-        enemy.damage=20+wave*3;
-        enemy.xp=300+wave*30;
-        enemy.color="#43164f";
-        enemy.name="👑 CHEFE";
-    }
-
-    enemies.push(enemy);
+ enemies.push(enemy);
 }
 
-/* XP */
+/* ================= XP ================= */
 
 function gainXP(amount){
 
-    player.xp+=amount;
+ player.xp+=amount;
 
-    while(player.xp>=player.nextXP){
+ while(player.xp>=player.nextXP){
 
-        player.xp-=player.nextXP;
+  player.xp-=player.nextXP;
+  player.level++;
 
-        player.level++;
+  player.nextXP=Math.floor(player.nextXP*1.45);
 
-        player.nextXP=
-            Math.floor(player.nextXP*1.45);
+  player.maxHp+=15;
+  player.hp=player.maxHp;
+  player.attack+=3;
 
-        player.maxHp+=15;
-        player.hp=player.maxHp;
-        player.attack+=3;
-
-        particle(
-            player.x,
-            player.y,
-            "⬆️ NÍVEL "+player.level
-        );
-
-        if(player.level===5)
-            showMessage("👹 ORCS DESBLOQUEADOS!");
-
-        if(player.level===10)
-            showMessage("🔥 DEMÔNIOS DESBLOQUEADOS!");
-
-        if(player.level===15)
-            showMessage("👑 CHEFES DESBLOQUEADOS!");
-    }
+  particle(player.x,player.y,"⬆️ NÍVEL "+player.level);
+ }
 }
 
-/* LIMPAR HORDA */
+/* ================= ITENS ESPECIAIS ================= */
+
+function specialItems(delta){
+
+ const garlic=countItem("garlic");
+
+ if(garlic>0){
+
+  const radius=100+garlic*15;
+
+  ctx.beginPath();
+  ctx.arc(player.x,player.y,radius,0,Math.PI*2);
+  ctx.fillStyle="rgba(50,200,70,.16)";
+  ctx.fill();
+
+  for(const enemy of enemies){
+
+   const d=Math.hypot(
+    player.x-enemy.x,
+    player.y-enemy.y
+   );
+
+   if(d<=radius){
+
+    enemy.hp-=garlic*0.06*delta;
+
+    if(enemy.hp<=0){
+     createDrop(enemy.x,enemy.y);
+     gainXP(enemy.xp);
+
+     const index=enemies.indexOf(enemy);
+     if(index>=0)enemies.splice(index,1);
+    }
+   }
+  }
+ }
+
+ const bible=countItem("bible");
+
+ if(bible>0){
+
+  for(let i=0;i<bible;i++){
+
+   const angle=
+    performance.now()/500+
+    i*(Math.PI*2/bible);
+
+   const bx=player.x+Math.cos(angle)*(60+i*8);
+   const by=player.y+Math.sin(angle)*(60+i*8);
+
+   ctx.font="25px Arial";
+   ctx.textAlign="center";
+   ctx.fillText("📖",bx,by);
+
+   for(const enemy of enemies){
+
+    if(Math.hypot(enemy.x-bx,enemy.y-by)<enemy.size/2+14){
+
+     if(!enemy.bookHitCooldown)enemy.bookHitCooldown=0;
+
+     if(enemy.bookHitCooldown<=0){
+
+      enemy.hp-=5;
+      enemy.bookHitCooldown=30;
+      particle(enemy.x,enemy.y,"-5");
+     }
+    }
+
+    if(enemy.bookHitCooldown>0)
+     enemy.bookHitCooldown-=delta;
+   }
+  }
+ }
+
+ /* Meteoros */
+
+ if(countItem("meteor")>0){
+
+  if(Math.random()<0.012*delta){
+
+   const x=Math.random()*W;
+   const y=Math.random()*H;
+
+   particles.push({
+    x:x,y:y,
+    life:70,
+    text:"☄️",
+    meteor:true,
+    radius:45
+   });
+
+   for(const enemy of enemies){
+
+    if(Math.hypot(enemy.x-x,enemy.y-y)<45){
+     damageEnemy(enemy,25);
+    }
+   }
+
+   showMessage("☄️ METEORO!");
+  }
+ }
+}
+
+/* ================= UPDATE ================= */
+
+function update(delta){
+
+ if(!playing)return;
+
+ if(waveTransition){
+
+  waveTimer-=delta;
+
+  if(waveTimer<=0)nextWave();
+
+  updateHUD();
+  return;
+ }
+
+ player.x+=joyX*player.speed*delta;
+ player.y+=joyY*player.speed*delta;
+
+ player.x=Math.max(25,Math.min(W-25,player.x));
+ player.y=Math.max(35,Math.min(H-25,player.y));
+
+ if(player.attackCooldown>0)
+  player.attackCooldown-=delta;
+
+ for(const enemy of enemies){
+
+  const dx=player.x-enemy.x;
+  const dy=player.y-enemy.y;
+  const distance=Math.hypot(dx,dy);
+
+  if(distance>45){
+
+   if(distance>0){
+    enemy.x+=dx/distance*enemy.speed*delta;
+    enemy.y+=dy/distance*enemy.speed*delta;
+   }
+
+  }else{
+
+   if(enemy.cooldown<=0){
+
+    const damage=Math.max(
+     1,
+     enemy.damage-player.defense
+    );
+
+    player.hp-=damage;
+    enemy.cooldown=50;
+
+    particle(player.x,player.y,"-"+damage);
+
+    if(player.hp<=0){
+     player.hp=0;
+     endGame();
+     return;
+    }
+   }
+  }
+
+  if(enemy.cooldown>0)
+   enemy.cooldown-=delta;
+ }
+
+ for(let i=drops.length-1;i>=0;i--){
+
+  const drop=drops[i];
+
+  drop.life-=delta;
+
+  const distance=Math.hypot(
+   player.x-drop.x,
+   player.y-drop.y
+  );
+
+  if(distance<38){
+   collectItem(drop.item);
+   drops.splice(i,1);
+   continue;
+  }
+
+  if(drop.life<=0)
+   drops.splice(i,1);
+ }
+
+ specialItems(delta);
+
+ for(const p of particles){
+
+  if(p.magic){
+   p.x+=p.vx*delta;
+   p.y+=p.vy*delta;
+
+   for(const enemy of enemies){
+
+    if(Math.hypot(enemy.x-p.x,enemy.y-p.y)<enemy.size/2+10){
+
+     damageEnemy(enemy,characters.Josef.attack);
+     p.life=0;
+     break;
+    }
+   }
+
+  }else if(!p.meteor){
+   p.y-=.5*delta;
+  }
+
+  p.life-=delta;
+ }
+
+ particles=particles.filter(p=>p.life>0);
+
+ updateHUD();
+ checkWaveClear();
+}
+
+/* ================= HORDA ================= */
 
 function checkWaveClear(){
 
-    if(!playing)return;
-    if(waveTransition)return;
+ if(!playing||waveTransition)return;
 
-    if(enemies.length===0){
+ if(enemies.length===0){
 
-        waveTransition=true;
-        waveTimer=180;
+  waveTransition=true;
+  waveTimer=180;
 
-        document.getElementById("waveTitle").textContent=
-            "🌊 HORDA "+wave+" LIMPA!";
+  document.getElementById("waveTitle").textContent=
+   "🌊 HORDA "+wave+" LIMPA!";
 
-        document.getElementById("waveDescription").textContent=
-            "Próxima horda chegando...";
+  document.getElementById("waveScreen").style.display="flex";
 
-        document.getElementById("waveScreen").style.display="flex";
-    }
+  if(wave>=5)saveData.wave5=true;
+  if(wave>=10){
+   saveData.wave10=true;
+   characters.Alicia.unlocked=true;
+  }
+
+  localStorage.setItem(
+   "reinoSombrioSave",
+   JSON.stringify(saveData)
+  );
+ }
 }
 
 function nextWave(){
 
-    wave++;
-    waveTransition=false;
+ wave++;
+ waveTransition=false;
 
-    document.getElementById("waveScreen").style.display="none";
+ document.getElementById("waveScreen").style.display="none";
 
-    player.hp=Math.min(
-        player.maxHp,
-        player.hp+25
-    );
+ player.hp=Math.min(player.maxHp,player.hp+25);
 
-    if(wave%3===0){
-        player.potions++;
-        showMessage("🧪 Você ganhou uma poção!");
-    }
+ if(wave%3===0){
+  player.potions++;
+ }
 
-    startWave();
+ startWave();
 }
 
-/* UPDATE */
-
-function update(delta){
-
-    if(!playing)return;
-
-    if(waveTransition){
-
-        waveTimer-=delta;
-
-        if(waveTimer<=0){
-            nextWave();
-        }
-
-        updateHUD();
-
-        return;
-    }
-
-    player.x+=joyX*player.speed*delta;
-    player.y+=joyY*player.speed*delta;
-
-    player.x=Math.max(
-        25,
-        Math.min(W-25,player.x)
-    );
-
-    player.y=Math.max(
-        35,
-        Math.min(H-25,player.y)
-    );
-
-    if(player.attackCooldown>0)
-        player.attackCooldown-=delta;
-
-    for(const enemy of enemies){
-
-        const dx=player.x-enemy.x;
-        const dy=player.y-enemy.y;
-
-        const distance=Math.hypot(dx,dy);
-
-        if(distance>45){
-
-            if(distance>0){
-
-                enemy.x+=
-                    dx/distance*
-                    enemy.speed*
-                    delta;
-
-                enemy.y+=
-                    dy/distance*
-                    enemy.speed*
-                    delta;
-            }
-
-        }else{
-
-            if(enemy.cooldown<=0){
-
-                const damage=Math.max(
-                    1,
-                    enemy.damage-player.defense
-                );
-
-                player.hp-=damage;
-
-                enemy.cooldown=50;
-
-                particle(
-                    player.x,
-                    player.y,
-                    "-"+damage
-                );
-
-                if(player.hp<=0){
-
-                    player.hp=0;
-                    endGame();
-                    return;
-                }
-            }
-        }
-
-        if(enemy.cooldown>0)
-            enemy.cooldown-=delta;
-    }
-
-    for(let i=drops.length-1;i>=0;i--){
-
-        const drop=drops[i];
-
-        drop.life-=delta;
-
-        const distance=Math.hypot(
-            player.x-drop.x,
-            player.y-drop.y
-        );
-
-        if(distance<38){
-
-            collectItem(drop.item);
-            drops.splice(i,1);
-            continue;
-        }
-
-        if(drop.life<=0)
-            drops.splice(i,1);
-    }
-
-    for(const p of particles){
-
-        p.y-=.5*delta;
-        p.life-=delta;
-    }
-
-    particles=particles.filter(
-        p=>p.life>0
-    );
-
-    updateHUD();
-}
-
-/* MAPA */
+/* ================= MAPA ================= */
 
 function drawMap(){
 
-    ctx.fillStyle="#397044";
-    ctx.fillRect(0,0,W,H);
+ ctx.fillStyle="#397044";
+ ctx.fillRect(0,0,W,H);
 
-    for(let x=0;x<W;x+=40){
+ for(let x=0;x<W;x+=40){
+  for(let y=0;y<H;y+=40){
 
-        for(let y=0;y<H;y+=40){
+   ctx.fillStyle=
+    ((x/40+y/40)%2===0)
+    ?"#3f7849"
+    :"#397044";
 
-            ctx.fillStyle=
-                ((x/40+y/40)%2===0)
-                ?"#3f7849"
-                :"#397044";
+   ctx.fillRect(x,y,40,40);
+  }
+ }
 
-            ctx.fillRect(x,y,40,40);
-        }
-    }
+ ctx.fillStyle="#96734c";
 
-    ctx.fillStyle="#96734c";
-
-    ctx.fillRect(
-        0,
-        H/2-30,
-        W,
-        60
-    );
-
-    ctx.fillRect(
-        W/2-30,
-        0,
-        60,
-        H
-    );
-
-    ctx.fillStyle="rgba(255,255,255,.13)";
-
-    for(let i=0;i<50;i++){
-
-        const x=(i*91)%W;
-        const y=(i*53)%H;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x,
-            y,
-            3,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-    }
+ ctx.fillRect(0,H/2-30,W,60);
+ ctx.fillRect(W/2-30,0,60,H);
 }
 
-/* PLAYER */
+/* ================= PLAYER ================= */
 
 function drawPlayer(){
 
-    ctx.fillStyle="rgba(0,0,0,.4)";
+ ctx.fillStyle="rgba(0,0,0,.4)";
+ ctx.beginPath();
+ ctx.arc(player.x,player.y+17,15,0,Math.PI*2);
+ ctx.fill();
 
-    ctx.beginPath();
+ if(selectedCharacter==="Josef"){
 
-    ctx.arc(
-        player.x,
-        player.y+17,
-        15,
-        0,
-        Math.PI*2
-    );
+  ctx.fillStyle="#3949ab";
+  ctx.fillRect(player.x-15,player.y-5,30,28);
 
-    ctx.fill();
+  ctx.fillStyle="#f0bd7a";
+  ctx.beginPath();
+  ctx.arc(player.x,player.y-14,12,0,Math.PI*2);
+  ctx.fill();
 
-    ctx.fillStyle="#2474b5";
+  ctx.fillStyle="#24145c";
+  ctx.beginPath();
+  ctx.arc(player.x,player.y-18,11,Math.PI,Math.PI*2);
+  ctx.fill();
 
-    ctx.fillRect(
-        player.x-15,
-        player.y-5,
-        30,
-        28
-    );
+  ctx.strokeStyle="#7ec8ff";
+  ctx.lineWidth=5;
+  ctx.beginPath();
+  ctx.moveTo(player.x+12,player.y+5);
+  ctx.lineTo(player.x+30,player.y-24);
+  ctx.stroke();
 
-    ctx.fillStyle="#f0bd7a";
+ }else if(selectedCharacter==="Alicia"){
 
-    ctx.beginPath();
+  ctx.fillStyle="#bd3048";
+  ctx.fillRect(player.x-15,player.y-5,30,28);
 
-    ctx.arc(
-        player.x,
-        player.y-14,
-        12,
-        0,
-        Math.PI*2
-    );
+  ctx.fillStyle="#f0bd7a";
+  ctx.beginPath();
+  ctx.arc(player.x,player.y-14,12,0,Math.PI*2);
+  ctx.fill();
 
-    ctx.fill();
+  ctx.fillStyle="#6b3820";
+  ctx.beginPath();
+  ctx.arc(player.x,player.y-18,11,Math.PI,Math.PI*2);
+  ctx.fill();
 
-    ctx.fillStyle="#392318";
+  ctx.strokeStyle="#fff";
+  ctx.lineWidth=6;
+  ctx.beginPath();
+  ctx.moveTo(player.x+10,player.y+3);
+  ctx.lineTo(player.x+35,player.y-25);
+  ctx.stroke();
 
-    ctx.beginPath();
+ }else{
 
-    ctx.arc(
-        player.x,
-        player.y-18,
-        11,
-        Math.PI,
-        Math.PI*2
-    );
+  ctx.fillStyle="#2474b5";
+  ctx.fillRect(player.x-15,player.y-5,30,28);
 
-    ctx.fill();
+  ctx.fillStyle="#f0bd7a";
+  ctx.beginPath();
+  ctx.arc(player.x,player.y-14,12,0,Math.PI*2);
+  ctx.fill();
 
-    ctx.fillStyle="#111";
+  ctx.fillStyle="#392318";
+  ctx.beginPath();
+  ctx.arc(player.x,player.y-18,11,Math.PI,Math.PI*2);
+  ctx.fill();
 
-    ctx.fillRect(
-        player.x-6,
-        player.y-15,
-        3,
-        3
-    );
+  ctx.strokeStyle="#eee";
+  ctx.lineWidth=5;
+  ctx.beginPath();
+  ctx.moveTo(player.x+10,player.y+3);
+  ctx.lineTo(player.x+30,player.y-22);
+  ctx.stroke();
+ }
 
-    ctx.fillRect(
-        player.x+3,
-        player.y-15,
-        3,
-        3
-    );
-
-    ctx.strokeStyle="#eee";
-    ctx.lineWidth=5;
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        player.x+10,
-        player.y+3
-    );
-
-    ctx.lineTo(
-        player.x+30,
-        player.y-22
-    );
-
-    ctx.stroke();
-
-    ctx.fillStyle="#fff";
-    ctx.font="bold 11px Arial";
-    ctx.textAlign="center";
-
-    ctx.fillText(
-        "LV "+player.level,
-        player.x,
-        player.y+40
-    );
+ ctx.fillStyle="#fff";
+ ctx.font="bold 11px Arial";
+ ctx.textAlign="center";
+ ctx.fillText("LV "+player.level,player.x,player.y+40);
 }
 
-/* MONSTROS */
+/* ================= INIMIGOS ================= */
 
 function drawEnemies(){
 
-    for(const enemy of enemies){
+ for(const enemy of enemies){
 
-        ctx.fillStyle="rgba(0,0,0,.4)";
+  ctx.fillStyle="rgba(0,0,0,.4)";
+  ctx.beginPath();
+  ctx.arc(
+   enemy.x,
+   enemy.y+enemy.size*.45,
+   enemy.size*.45,
+   0,
+   Math.PI*2
+  );
+  ctx.fill();
 
-        ctx.beginPath();
+  ctx.fillStyle=enemy.color;
+  ctx.beginPath();
+  ctx.arc(enemy.x,enemy.y,enemy.size/2,0,Math.PI*2);
+  ctx.fill();
 
-        ctx.arc(
-            enemy.x,
-            enemy.y+enemy.size*.45,
-            enemy.size*.45,
-            0,
-            Math.PI*2
-        );
+  ctx.fillStyle="#fff";
 
-        ctx.fill();
+  ctx.beginPath();
+  ctx.arc(
+   enemy.x-enemy.size*.2,
+   enemy.y-enemy.size*.08,
+   5,0,Math.PI*2
+  );
+  ctx.fill();
 
-        ctx.fillStyle=enemy.color;
+  ctx.beginPath();
+  ctx.arc(
+   enemy.x+enemy.size*.2,
+   enemy.y-enemy.size*.08,
+   5,0,Math.PI*2
+  );
+  ctx.fill();
 
-        ctx.beginPath();
+  const barWidth=Math.max(60,enemy.size*1.7);
+  const barY=enemy.y-enemy.size/2-25;
+  const barX=enemy.x-barWidth/2;
 
-        ctx.arc(
-            enemy.x,
-            enemy.y,
-            enemy.size/2,
-            0,
-            Math.PI*2
-        );
+  ctx.fillStyle="#111";
+  ctx.fillRect(barX,barY,barWidth,enemy.type==="orcBoss"?10:7);
 
-        ctx.fill();
+  ctx.fillStyle=enemy.type==="orcBoss"?"#ff1744":"#39d353";
+  ctx.fillRect(
+   barX,
+   barY,
+   barWidth*Math.max(0,enemy.hp/enemy.maxHp),
+   enemy.type==="orcBoss"?10:7
+  );
 
-        if(
-            enemy.type==="demon"||
-            enemy.type==="boss"
-        ){
+  if(enemy.type!=="slime"){
 
-            ctx.fillStyle="#32101d";
+   ctx.fillStyle="#fff";
+   ctx.font="bold 11px Arial";
+   ctx.textAlign="center";
 
-            ctx.beginPath();
-
-            ctx.moveTo(
-                enemy.x-enemy.size*.25,
-                enemy.y-enemy.size*.25
-            );
-
-            ctx.lineTo(
-                enemy.x-enemy.size*.45,
-                enemy.y-enemy.size*.75
-            );
-
-            ctx.lineTo(
-                enemy.x,
-                enemy.y-enemy.size*.3
-            );
-
-            ctx.fill();
-
-            ctx.beginPath();
-
-            ctx.moveTo(
-                enemy.x+enemy.size*.25,
-                enemy.y-enemy.size*.25
-            );
-
-            ctx.lineTo(
-                enemy.x+enemy.size*.45,
-                enemy.y-enemy.size*.75
-            );
-
-            ctx.lineTo(
-                enemy.x,
-                enemy.y-enemy.size*.3
-            );
-
-            ctx.fill();
-        }
-
-        ctx.fillStyle="#fff";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            enemy.x-enemy.size*.2,
-            enemy.y-enemy.size*.08,
-            5,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-        ctx.beginPath();
-
-        ctx.arc(
-            enemy.x+enemy.size*.2,
-            enemy.y-enemy.size*.08,
-            5,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-        ctx.fillStyle="#111";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            enemy.x-enemy.size*.2,
-            enemy.y-enemy.size*.08,
-            2,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-        ctx.beginPath();
-
-        ctx.arc(
-            enemy.x+enemy.size*.2,
-            enemy.y-enemy.size*.08,
-            2,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-        const barWidth=Math.max(
-            60,
-            enemy.size*1.7
-        );
-
-        const barHeight=
-            enemy.type==="boss"?9:7;
-
-        const barX=
-            enemy.x-barWidth/2;
-
-        const barY=
-            enemy.y-
-            enemy.size/2-
-            25;
-
-        if(enemy.type!=="slime"){
-
-            ctx.fillStyle="#fff";
-            ctx.font="bold 11px Arial";
-            ctx.textAlign="center";
-
-            ctx.fillText(
-                enemy.name,
-                enemy.x,
-                barY-18
-            );
-        }
-
-        ctx.fillStyle="#111";
-
-        ctx.fillRect(
-            barX,
-            barY,
-            barWidth,
-            barHeight
-        );
-
-        const hpPercent=Math.max(
-            0,
-            Math.min(
-                1,
-                enemy.hp/enemy.maxHp
-            )
-        );
-
-        ctx.fillStyle=
-            enemy.type==="boss"
-            ?"#ff1744"
-            :"#39d353";
-
-        ctx.fillRect(
-            barX,
-            barY,
-            barWidth*hpPercent,
-            barHeight
-        );
-
-        ctx.fillStyle="#fff";
-
-        ctx.font=
-            "bold "+
-            (enemy.type==="boss"?12:10)+
-            "px Arial";
-
-        ctx.textAlign="center";
-
-        ctx.fillText(
-            Math.ceil(enemy.hp)+
-            " / "+
-            Math.ceil(enemy.maxHp),
-            enemy.x,
-            barY-4
-        );
-    }
+   ctx.fillText(
+    enemy.name,
+    enemy.x,
+    barY-7
+   );
+  }
+ }
 }
 
-/* DROPS */
+/* ================= DROPS ================= */
 
 function drawDrops(){
 
-    for(const drop of drops){
+ for(const drop of drops){
 
-        ctx.globalAlpha=
-            .75+
-            Math.sin(drop.life*.1)*.2;
+  ctx.fillStyle="#ffd54f";
 
-        ctx.fillStyle="#ffd54f";
+  ctx.beginPath();
+  ctx.arc(drop.x,drop.y,17,0,Math.PI*2);
+  ctx.fill();
 
-        ctx.beginPath();
+  ctx.font="23px Arial";
+  ctx.textAlign="center";
 
-        ctx.arc(
-            drop.x,
-            drop.y,
-            17,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-        ctx.globalAlpha=1;
-
-        ctx.font="23px Arial";
-        ctx.textAlign="center";
-
-        ctx.fillText(
-            drop.item.icon,
-            drop.x,
-            drop.y+8
-        );
-    }
+  ctx.fillText(
+   drop.item.icon,
+   drop.x,
+   drop.y+8
+  );
+ }
 }
 
-/* PARTICULAS */
+/* ================= PARTICULAS ================= */
 
 function particle(x,y,text){
 
-    particles.push({
-        x:x,
-        y:y,
-        text:text,
-        life:60
-    });
+ particles.push({
+  x:x,
+  y:y,
+  text:text,
+  life:60
+ });
 }
 
 function drawParticles(){
 
-    for(const p of particles){
+ for(const p of particles){
 
-        ctx.globalAlpha=p.life/60;
+  if(p.magic){
 
-        ctx.fillStyle="#fff";
-        ctx.font="bold 16px Arial";
-        ctx.textAlign="center";
+   ctx.font="25px Arial";
+   ctx.textAlign="center";
+   ctx.fillText("🔵",p.x,p.y);
 
-        ctx.fillText(
-            p.text,
-            p.x,
-            p.y
-        );
+  }else if(p.meteor){
 
-        ctx.globalAlpha=1;
-    }
+   ctx.globalAlpha=p.life/70;
+
+   ctx.fillStyle="rgba(255,100,20,.25)";
+   ctx.beginPath();
+   ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+   ctx.fill();
+
+   ctx.font="40px Arial";
+   ctx.fillText("☄️",p.x,p.y);
+
+   ctx.globalAlpha=1;
+
+  }else{
+
+   ctx.globalAlpha=p.life/60;
+
+   ctx.fillStyle="#fff";
+   ctx.font="bold 16px Arial";
+   ctx.textAlign="center";
+
+   ctx.fillText(p.text,p.x,p.y);
+
+   ctx.globalAlpha=1;
+  }
+ }
 }
 
-/* HUD */
+/* ================= HUD ================= */
 
 function updateHUD(){
 
-    document.getElementById("levelText").textContent=
-        "⚔️ Nível "+player.level;
+ document.getElementById("levelText").textContent=
+  "⚔️ Nível "+player.level;
 
-    document.getElementById("attackText").textContent=
-        player.attack;
+ document.getElementById("attackText").textContent=
+  player.attack;
 
-    document.getElementById("defenseText").textContent=
-        player.defense;
+ document.getElementById("defenseText").textContent=
+  player.defense;
 
-    document.getElementById("potionText").textContent=
-        player.potions;
+ document.getElementById("potionText").textContent=
+  player.potions;
 
-    document.getElementById("waveText").textContent=
-        "🌊 Horda "+wave;
+ document.getElementById("characterText").textContent=
+  characters[selectedCharacter].name;
 
-    document.getElementById("enemyCount").textContent=
-        enemies.length;
+ document.getElementById("waveText").textContent=
+  "🌊 Horda "+wave;
 
-    document.getElementById("hpBar").style.width=
-        Math.max(
-            0,
-            player.hp/player.maxHp*100
-        )+"%";
+ document.getElementById("enemyCount").textContent=
+  enemies.length;
 
-    document.getElementById("xpBar").style.width=
-        Math.max(
-            0,
-            player.xp/player.nextXP*100
-        )+"%";
+ document.getElementById("hpBar").style.width=
+  Math.max(0,player.hp/player.maxHp*100)+"%";
+
+ document.getElementById("xpBar").style.width=
+  Math.max(0,player.xp/player.nextXP*100)+"%";
 }
 
-/* MENSAGEM */
+/* ================= MENSAGEM ================= */
 
 let messageTimeout=null;
 
 function showMessage(text){
 
-    const message=document.getElementById("message");
+ const message=document.getElementById("message");
 
-    message.textContent=text;
+ message.textContent=text;
 
-    if(messageTimeout!==null)
-        clearTimeout(messageTimeout);
+ if(messageTimeout!==null)
+  clearTimeout(messageTimeout);
 
-    messageTimeout=setTimeout(
-        ()=>{
-            message.textContent=
-                "⚔️ Derrote todos os monstros!";
-        },
-        2200
-    );
+ messageTimeout=setTimeout(()=>{
+  message.textContent="⚔️ Derrote todos os monstros!";
+ },2200);
 }
 
-/* GAME OVER */
+/* ================= GAME OVER ================= */
 
 function endGame(){
 
-    playing=false;
+ playing=false;
 
-    document.getElementById("result").textContent=
-        "Nível "+
-        player.level+
-        " • Horda "+
-        wave;
+ document.getElementById("result").textContent=
+  "Nível "+player.level+" • Horda "+wave;
 
-    document.getElementById("gameOver").style.display="flex";
+ document.getElementById("gameOver").style.display="flex";
 }
 
-/* LOOP */
+/* ================= DRAW ================= */
+
+function draw(){
+
+ drawMap();
+ specialItems(0);
+ drawDrops();
+ drawEnemies();
+ drawPlayer();
+ drawParticles();
+}
+
+/* ================= LOOP ================= */
 
 let lastTime=performance.now();
 
 function gameLoop(time){
 
-    if(!playing){
+ if(!playing){
+  draw();
+  return;
+ }
 
-        draw();
-        return;
-    }
+ let delta=(time-lastTime)/16.67;
 
-    let delta=(time-lastTime)/16.67;
+ if(!Number.isFinite(delta))delta=1;
+ if(delta>2)delta=2;
+ if(delta<0)delta=1;
 
-    if(!Number.isFinite(delta))delta=1;
-    if(delta>2)delta=2;
-    if(delta<0)delta=1;
+ lastTime=time;
 
-    lastTime=time;
+ update(delta);
+ draw();
 
-    update(delta);
-    draw();
-
-    requestAnimationFrame(gameLoop);
+ requestAnimationFrame(gameLoop);
 }
 
-function draw(){
+/* ================= INVENTÁRIO ================= */
 
-    drawMap();
-    drawDrops();
-    drawEnemies();
-    drawPlayer();
-    drawParticles();
-}
+document.getElementById("inventoryButton").addEventListener("pointerdown",e=>{
+ e.preventDefault();
 
-/* PWA */
+ renderInventory();
+ openPanel("inventory");
+});
+
+/* ================= INÍCIO ================= */
 
 if("serviceWorker" in navigator){
 
-    window.addEventListener(
-        "load",
-        ()=>{
-            navigator.serviceWorker.register(
-                "./service-worker.js"
-            ).catch(
-                error=>console.log(
-                    "Service Worker:",
-                    error
-                )
-            );
-        }
-    );
+ window.addEventListener("load",()=>{
+  navigator.serviceWorker.register(
+   "./service-worker.js"
+  ).catch(error=>console.log(error));
+ });
 }
 
+renderCharacters();
+renderMissions();
 draw();
 updateHUD();
 
-</script></body>
+</script>
+</body>
 </html>

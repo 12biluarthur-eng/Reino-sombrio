@@ -1,0 +1,12 @@
+{
+"name": "Reino Sombrio RPG",
+"short_name": "Reino Sombrio",
+"description": "RPG mobile de sobrevivência contra hordas de monstros.",
+"start_url": "./index.html",
+"display": "standalone",
+"orientation": "landscape",
+"background_color": "#315d38",
+"theme_color": "#171021",
+"lang": "pt-BR",
+"icons": []
+}

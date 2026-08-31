@@ -1,68 +1,66 @@
-const CACHE_NAME = "reino-sombrio-v1";
+const CACHE_NAME = "reino-sombrio-v2";
 
 const FILES = [
-"./",
-"./index.html",
-"./manifest.json"
+    "./",
+    "./index.html",
+    "./manifest.json",
+    "./service-worker.js"
 ];
 
 self.addEventListener("install", event => {
 
-event.waitUntil(
-    caches.open(CACHE_NAME)
-        .then(cache => cache.addAll(FILES))
-);
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => cache.addAll(FILES))
+    );
 
-self.skipWaiting();
-
+    self.skipWaiting();
 });
 
 self.addEventListener("activate", event => {
 
-event.waitUntil(
-    caches.keys().then(keys =>
-        Promise.all(
-            keys
-                .filter(key => key !== CACHE_NAME)
-                .map(key => caches.delete(key))
+    event.waitUntil(
+        caches.keys().then(keys =>
+            Promise.all(
+                keys
+                    .filter(key => key !== CACHE_NAME)
+                    .map(key => caches.delete(key))
+            )
         )
-    )
-);
+    );
 
-self.clients.claim();
-
+    self.clients.claim();
 });
 
 self.addEventListener("fetch", event => {
 
-event.respondWith(
+    event.respondWith(
 
-    caches.match(event.request)
-        .then(cached => {
+        caches.match(event.request)
+            .then(cached => {
 
-            if(cached){
-                return cached;
-            }
+                if(cached){
+                    return cached;
+                }
 
-            return fetch(event.request)
-                .then(response => {
+                return fetch(event.request)
+                    .then(response => {
 
-                    const copy=response.clone();
+                        const copy = response.clone();
 
-                    caches.open(CACHE_NAME)
-                        .then(cache =>
-                            cache.put(
-                                event.request,
-                                copy
-                            )
-                        );
+                        caches.open(CACHE_NAME)
+                            .then(cache =>
+                                cache.put(
+                                    event.request,
+                                    copy
+                                )
+                            );
 
-                    return response;
-                })
-                .catch(() =>
-                    caches.match("./index.html")
-                );
-        })
-);
-
+                        return response;
+                    })
+                    .catch(() =>
+                        caches.match("./index.html")
+                    );
+            })
+    );
 });

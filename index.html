@@ -2,12 +2,15 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+
 <meta name="theme-color" content="#171021">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<link rel="manifest" href="manifest.json">
-<title>Reino Sombrio</title>
+
+<link rel="manifest" href="./manifest.json">
+
+<title>Reino Sombrio 2.0</title>
 
 <style>
 *{
@@ -28,28 +31,36 @@ html,body{
  font-family:Arial,sans-serif;
 }
 
+body{
+ position:fixed;
+ inset:0;
+}
+
 canvas{
  position:fixed;
  inset:0;
  width:100%;
  height:100%;
+ display:block;
 }
 
 button{
  touch-action:manipulation;
+ -webkit-touch-callout:none;
 }
 
 #hud{
  position:fixed;
- top:8px;
- left:8px;
- width:215px;
+ top:calc(8px + env(safe-area-inset-top));
+ left:calc(8px + env(safe-area-inset-left));
+ width:220px;
  padding:9px;
  color:#fff;
- background:rgba(0,0,0,.75);
+ background:rgba(0,0,0,.78);
  border-radius:12px;
  z-index:20;
  font-size:13px;
+ pointer-events:none;
 }
 
 .bar{
@@ -61,8 +72,17 @@ button{
  overflow:hidden;
 }
 
-#hpBar{height:100%;background:#e53935}
-#xpBar{height:100%;background:#2196f3}
+#hpBar{
+ height:100%;
+ width:100%;
+ background:#e53935;
+}
+
+#xpBar{
+ height:100%;
+ width:0%;
+ background:#2196f3;
+}
 
 #waveText{
  color:#ffd54f;
@@ -71,8 +91,8 @@ button{
 
 #inventoryButton{
  position:fixed;
- right:10px;
- top:10px;
+ right:calc(10px + env(safe-area-inset-right));
+ top:calc(10px + env(safe-area-inset-top));
  width:56px;
  height:56px;
  border:0;
@@ -201,13 +221,14 @@ button{
 #joystick{
  position:fixed;
  left:18px;
- bottom:18px;
+ bottom:calc(18px + env(safe-area-inset-bottom));
  width:140px;
  height:140px;
  border-radius:50%;
  background:rgba(255,255,255,.13);
  border:3px solid rgba(255,255,255,.3);
  z-index:30;
+ touch-action:none;
 }
 
 #stick{
@@ -218,12 +239,13 @@ button{
  height:56px;
  border-radius:50%;
  background:rgba(255,255,255,.72);
+ pointer-events:none;
 }
 
 #attackButton{
  position:fixed;
- right:20px;
- bottom:25px;
+ right:calc(20px + env(safe-area-inset-right));
+ bottom:calc(25px + env(safe-area-inset-bottom));
  width:92px;
  height:92px;
  border:0;
@@ -241,8 +263,8 @@ button{
 
 #potionButton{
  position:fixed;
- right:125px;
- bottom:125px;
+ right:calc(125px + env(safe-area-inset-right));
+ bottom:calc(125px + env(safe-area-inset-bottom));
  width:62px;
  height:62px;
  border:0;
@@ -265,6 +287,7 @@ button{
  font-size:11px;
  z-index:25;
  pointer-events:none;
+ white-space:nowrap;
 }
 
 .screen{
@@ -318,6 +341,97 @@ button{
  font-size:38px;
  margin-bottom:10px;
 }
+
+#bossHud{
+ display:none;
+ position:fixed;
+ left:50%;
+ top:10px;
+ transform:translateX(-50%);
+ width:min(75vw,520px);
+ z-index:25;
+ text-align:center;
+ pointer-events:none;
+}
+
+#bossName{
+ color:#ff5252;
+ font-weight:bold;
+ font-size:15px;
+ text-shadow:0 2px 4px #000;
+ margin-bottom:3px;
+}
+
+#bossBar{
+ width:100%;
+ height:16px;
+ border:2px solid #fff;
+ border-radius:10px;
+ background:#160606;
+ overflow:hidden;
+ box-shadow:0 3px 10px #000;
+}
+
+#bossHp{
+ height:100%;
+ width:100%;
+ background:#ff1744;
+}
+
+#bossHpText{
+ color:#fff;
+ font-weight:bold;
+ font-size:12px;
+ text-shadow:0 2px 3px #000;
+ margin-top:3px;
+}
+
+#saveText{
+ position:fixed;
+ right:10px;
+ bottom:8px;
+ color:rgba(255,255,255,.5);
+ font-size:10px;
+ z-index:20;
+ pointer-events:none;
+}
+
+@media(max-width:600px){
+ #hud{
+  width:190px;
+  font-size:11px;
+ }
+
+ .screen h1{
+  font-size:31px;
+ }
+
+ #bossHud{
+  width:60vw;
+ }
+}
+
+@media(max-height:500px){
+ #joystick{
+  width:120px;
+  height:120px;
+ }
+
+ #stick{
+  left:32px;
+  top:32px;
+ }
+
+ #attackButton{
+  width:78px;
+  height:78px;
+ }
+
+ #potionButton{
+  width:55px;
+  height:55px;
+ }
+}
 </style>
 </head>
 
@@ -327,6 +441,7 @@ button{
 
 <div id="hud">
 <b id="levelText">⚔️ Nível 1</b><br><br>
+
 ❤️ Vida
 <div class="bar"><div id="hpBar"></div></div>
 
@@ -340,6 +455,14 @@ button{
 
 <span id="waveText">🌊 Horda 1</span><br>
 👹 Restantes: <span id="enemyCount">0</span>
+</div>
+
+<div id="bossHud">
+ <div id="bossName">👑 CHEFE ORC</div>
+ <div id="bossBar">
+  <div id="bossHp"></div>
+ </div>
+ <div id="bossHpText">1800 / 1800</div>
 </div>
 
 <button id="inventoryButton">🎒</button>
@@ -370,7 +493,8 @@ button{
 <button id="attackButton">⚔️</button>
 <button id="potionButton">🧪</button>
 
-<div id="message">Derrote todos os monstros!</div>
+<div id="message">⚔️ Derrote todos os monstros!</div>
+<div id="saveText">💾 Salvando...</div>
 
 <div id="menu" class="screen">
 <h1>⚔️ Reino Sombrio</h1>
@@ -397,16 +521,57 @@ button{
 const canvas=document.getElementById("game");
 const ctx=canvas.getContext("2d");
 
-let W=innerWidth,H=innerHeight;
+let W=innerWidth;
+let H=innerHeight;
 
 function resize(){
  W=innerWidth;
  H=innerHeight;
  canvas.width=W;
  canvas.height=H;
+
+ if(player && !playing){
+  player.x=W/2;
+  player.y=H/2;
+ }
 }
+
 addEventListener("resize",resize);
-resize();
+
+/* ================= SAVE ================= */
+
+const SAVE_KEY="reinoSombrioSaveV2";
+
+let saveData={};
+
+try{
+ saveData=JSON.parse(localStorage.getItem(SAVE_KEY)||"{}");
+}catch(e){
+ saveData={};
+}
+
+function saveGame(){
+
+ saveData.selectedCharacter=selectedCharacter;
+ saveData.wave5=!!saveData.wave5;
+ saveData.wave10=!!saveData.wave10;
+ saveData.orc25=!!saveData.orc25;
+
+ localStorage.setItem(
+  SAVE_KEY,
+  JSON.stringify(saveData)
+ );
+
+ const saveText=document.getElementById("saveText");
+
+ saveText.textContent="💾 Salvo!";
+
+ clearTimeout(window.saveTextTimer);
+
+ window.saveTextTimer=setTimeout(()=>{
+  saveText.textContent="💾 Salvando...";
+ },1200);
+}
 
 /* ================= PERSONAGENS ================= */
 
@@ -442,22 +607,33 @@ const characters={
  }
 };
 
-let selectedCharacter=localStorage.getItem("selectedCharacter")||"Ruan";
-
-let saveData=JSON.parse(
- localStorage.getItem("reinoSombrioSave")||"{}"
-);
-
 if(saveData.alicia)characters.Alicia.unlocked=true;
 if(saveData.josef)characters.Josef.unlocked=true;
 
-/* ================= JOGADOR ================= */
+let selectedCharacter=
+ saveData.selectedCharacter||
+ localStorage.getItem("selectedCharacter")||
+ "Ruan";
+
+if(!characters[selectedCharacter]){
+ selectedCharacter="Ruan";
+}
+
+/* ================= PLAYER ================= */
 
 const player={
- x:0,y:0,radius:19,speed:4,
- hp:100,maxHp:100,
- level:1,xp:0,nextXP:50,
- attack:10,defense:0,potions:3,
+ x:W/2,
+ y:H/2,
+ radius:19,
+ speed:4,
+ hp:100,
+ maxHp:100,
+ level:1,
+ xp:0,
+ nextXP:50,
+ attack:10,
+ defense:0,
+ potions:3,
  attackCooldown:0
 };
 
@@ -471,6 +647,8 @@ let drops=[];
 let particles=[];
 let inventory=[];
 
+/* ================= ITENS ================= */
+
 const itemTypes=[
  {name:"Espada",icon:"🗡️",type:"attack",value:3},
  {name:"Machado",icon:"🪓",type:"attack",value:7},
@@ -478,13 +656,12 @@ const itemTypes=[
  {name:"Capacete",icon:"⛑️",type:"defense",value:2},
  {name:"Coração",icon:"❤️",type:"health",value:15},
  {name:"Botas",icon:"👢",type:"speed",value:.25},
-
  {name:"Alho",icon:"🧄",type:"garlic",value:1},
  {name:"Meteoro",icon:"☄️",type:"meteor",value:25},
  {name:"Bíblia",icon:"📖",type:"bible",value:5}
 ];
 
-/* ================= MENU ================= */
+/* ================= PAINÉIS ================= */
 
 function openPanel(id){
  document.getElementById(id).style.display="block";
@@ -506,11 +683,19 @@ document.getElementById("missionsButton").addEventListener("pointerdown",e=>{
  openPanel("missions");
 });
 
+document.getElementById("inventoryButton").addEventListener("pointerdown",e=>{
+ e.preventDefault();
+
+ renderInventory();
+ openPanel("inventory");
+});
+
 /* ================= PERSONAGENS ================= */
 
 function renderCharacters(){
 
  const box=document.getElementById("characterList");
+
  box.innerHTML="";
 
  for(const key of Object.keys(characters)){
@@ -518,9 +703,15 @@ function renderCharacters(){
   const c=characters[key];
 
   const card=document.createElement("div");
-  card.className="characterCard "+(c.unlocked?"unlocked":"locked");
 
-  let status=c.unlocked?"✅ DESBLOQUEADO":"🔒 BLOQUEADO";
+  card.className=
+   "characterCard "+
+   (c.unlocked?"unlocked":"locked");
+
+  const status=
+   c.unlocked
+   ?"✅ DESBLOQUEADO"
+   :"🔒 BLOQUEADO";
 
   card.innerHTML=
    "<h3>"+c.icon+" "+c.name+"</h3>"+
@@ -528,7 +719,9 @@ function renderCharacters(){
    "<p>"+status+"</p>";
 
   const button=document.createElement("button");
+
   button.className="characterSelect";
+
   button.textContent=
    selectedCharacter===key
    ?"EQUIPADO"
@@ -538,12 +731,16 @@ function renderCharacters(){
 
   button.onclick=()=>{
    selectedCharacter=key;
-   localStorage.setItem("selectedCharacter",key);
+
+   saveGame();
+
    renderCharacters();
+
    showMessage("👤 "+c.name+" selecionado!");
   };
 
   card.appendChild(button);
+
   box.appendChild(card);
  }
 }
@@ -551,15 +748,17 @@ function renderCharacters(){
 /* ================= MISSÕES ================= */
 
 function missionStatus(condition){
- return condition?"✅ CONCLUÍDA":"🔒 NÃO CONCLUÍDA";
+ return condition
+  ?"✅ CONCLUÍDA"
+  :"🔒 NÃO CONCLUÍDA";
 }
 
 function renderMissions(){
 
  const box=document.getElementById("missionList");
 
- const m5=wave>=5 || saveData.wave5;
- const m10=wave>=10 || saveData.wave10;
+ const m5=wave>=5||saveData.wave5;
+ const m10=wave>=10||saveData.wave10;
  const orc25=saveData.orc25;
 
  box.innerHTML="";
@@ -588,7 +787,10 @@ function renderMissions(){
  for(const m of missions){
 
   const card=document.createElement("div");
-  card.className="missionCard "+(m.done?"missionDone":"");
+
+  card.className=
+   "missionCard "+
+   (m.done?"missionDone":"");
 
   card.innerHTML=
    "<b>"+m.title+"</b><br>"+
@@ -603,6 +805,7 @@ function renderMissions(){
 /* ================= INVENTÁRIO ================= */
 
 function bonusName(type){
+
  if(type==="attack")return"ATQ";
  if(type==="defense")return"DEF";
  if(type==="health")return"VIDA";
@@ -610,17 +813,20 @@ function bonusName(type){
  if(type==="garlic")return"ÁREA";
  if(type==="meteor")return"DANO";
  if(type==="bible")return"DANO";
+
  return"";
 }
 
 function renderInventory(){
 
  const slots=document.getElementById("slots");
+
  slots.innerHTML="";
 
  for(let i=0;i<9;i++){
 
   const slot=document.createElement("div");
+
   slot.className="slot";
 
   if(inventory[i]){
@@ -629,14 +835,22 @@ function renderInventory(){
 
    slot.innerHTML=
     item.icon+
-    "<small>"+item.name+
-    "<br>"+bonusName(item.type)+
-    (item.type==="meteor"||item.type==="bible"
-     ?" "+item.value:" +"+item.value)+
+    "<small>"+
+    item.name+
+    "<br>"+
+    bonusName(item.type)+
+    (
+     item.type==="meteor"||
+     item.type==="bible"
+     ?" "+item.value
+     :" +"+item.value
+    )+
     "</small>";
 
   }else{
+
    slot.classList.add("empty");
+
    slot.textContent="—";
   }
 
@@ -661,24 +875,33 @@ function countItem(type){
 function collectItem(item){
 
  if(inventory.length>=9){
+
   showMessage("🎒 Inventário cheio!");
+
   return;
  }
 
  inventory.push({...item});
 
- if(item.type==="attack")player.attack+=item.value;
- if(item.type==="defense")player.defense+=item.value;
+ if(item.type==="attack")
+  player.attack+=item.value;
+
+ if(item.type==="defense")
+  player.defense+=item.value;
 
  if(item.type==="health"){
+
   player.maxHp+=item.value;
   player.hp+=item.value;
  }
 
- if(item.type==="speed")player.speed+=item.value;
+ if(item.type==="speed")
+  player.speed+=item.value;
 
  particle(player.x,player.y,item.icon);
+
  showMessage("🎒 Pegou: "+item.name);
+
  renderInventory();
 }
 
@@ -688,9 +911,10 @@ function createDrop(x,y){
 
  if(Math.random()>.22)return;
 
- const item=itemTypes[
-  Math.floor(Math.random()*itemTypes.length)
- ];
+ const item=
+  itemTypes[
+   Math.floor(Math.random()*itemTypes.length)
+  ];
 
  drops.push({
   x:x,
@@ -705,7 +929,8 @@ function createDrop(x,y){
 const joystick=document.getElementById("joystick");
 const stick=document.getElementById("stick");
 
-let joyX=0,joyY=0;
+let joyX=0;
+let joyY=0;
 let joystickActive=false;
 let joystickPointer=null;
 
@@ -723,6 +948,7 @@ function updateJoystick(x,y){
  const distance=Math.hypot(dx,dy);
 
  if(distance>max){
+
   dx=dx/distance*max;
   dy=dy/distance*max;
  }
@@ -738,6 +964,7 @@ function resetJoystick(){
 
  joystickActive=false;
  joystickPointer=null;
+
  joyX=0;
  joyY=0;
 
@@ -746,36 +973,64 @@ function resetJoystick(){
 }
 
 joystick.addEventListener("pointerdown",e=>{
+
  e.preventDefault();
+
  joystickActive=true;
  joystickPointer=e.pointerId;
+
+ if(joystick.setPointerCapture){
+  try{
+   joystick.setPointerCapture(e.pointerId);
+  }catch(err){}
+ }
+
  updateJoystick(e.clientX,e.clientY);
 });
 
 joystick.addEventListener("pointermove",e=>{
- if(!joystickActive||e.pointerId!==joystickPointer)return;
+
+ if(
+  !joystickActive||
+  e.pointerId!==joystickPointer
+ )return;
+
  e.preventDefault();
+
  updateJoystick(e.clientX,e.clientY);
 });
 
-joystick.addEventListener("pointerup",resetJoystick);
+joystick.addEventListener("pointerup",e=>{
+ if(e.pointerId===joystickPointer)
+  resetJoystick();
+});
+
 joystick.addEventListener("pointercancel",resetJoystick);
+joystick.addEventListener("lostpointercapture",resetJoystick);
 
 /* ================= ATAQUE ================= */
 
 document.getElementById("attackButton").addEventListener("pointerdown",e=>{
+
  e.preventDefault();
+
  attack();
 });
 
 function attack(){
 
- if(!playing||waveTransition||player.attackCooldown>0)return;
+ if(
+  !playing||
+  waveTransition||
+  player.attackCooldown>0
+ )return;
 
  player.attackCooldown=22;
 
  if(selectedCharacter==="Josef"){
+
   magicAttack();
+
   return;
  }
 
@@ -783,18 +1038,33 @@ function attack(){
  let closestDistance=Infinity;
 
  for(const enemy of enemies){
-  const d=Math.hypot(player.x-enemy.x,player.y-enemy.y);
+
+  const d=Math.hypot(
+   player.x-enemy.x,
+   player.y-enemy.y
+  );
 
   if(d<closestDistance){
+
    closestDistance=d;
    closest=enemy;
   }
  }
 
  if(closest&&closestDistance<=110){
-  damageEnemy(closest,player.attack);
+
+  damageEnemy(
+   closest,
+   player.attack
+  );
+
  }else{
-  particle(player.x+35,player.y,"⚔️");
+
+  particle(
+   player.x+35,
+   player.y,
+   "⚔️"
+  );
  }
 
  checkWaveClear();
@@ -802,28 +1072,49 @@ function attack(){
 
 function damageEnemy(enemy,damage){
 
+ if(!enemy||enemy.hp<=0)return;
+
  enemy.hp-=damage;
 
- particle(enemy.x,enemy.y,"-"+damage);
+ particle(
+  enemy.x,
+  enemy.y,
+  "-"+Math.floor(damage)
+ );
 
  if(enemy.hp<=0){
 
-  if(enemy.type==="orcBoss"&&wave===25){
+  if(
+   enemy.type==="orcBoss"&&
+   wave===25
+  ){
+
    saveData.orc25=true;
-   localStorage.setItem("reinoSombrioSave",JSON.stringify(saveData));
+
    characters.Josef.unlocked=true;
-   showMessage("🎉 JOSEF DESBLOQUEADO!");
+
+   saveGame();
+
+   showMessage(
+    "🎉 JOSEF DESBLOQUEADO!"
+   );
   }
 
-  createDrop(enemy.x,enemy.y);
+  createDrop(
+   enemy.x,
+   enemy.y
+  );
+
   gainXP(enemy.xp);
 
   const index=enemies.indexOf(enemy);
-  if(index>=0)enemies.splice(index,1);
+
+  if(index>=0)
+   enemies.splice(index,1);
  }
 }
 
-/* ================= MAGIA DO JOSEF ================= */
+/* ================= MAGIA ================= */
 
 function magicAttack(){
 
@@ -838,6 +1129,7 @@ function magicAttack(){
   );
 
   if(d<closestDistance){
+
    closestDistance=d;
    closest=enemy;
   }
@@ -864,7 +1156,9 @@ function magicAttack(){
 /* ================= POÇÃO ================= */
 
 document.getElementById("potionButton").addEventListener("pointerdown",e=>{
+
  e.preventDefault();
+
  usePotion();
 });
 
@@ -873,24 +1167,54 @@ function usePotion(){
  if(!playing)return;
 
  if(player.potions<=0){
+
   showMessage("❌ Sem poções!");
+
   return;
  }
 
  if(player.hp>=player.maxHp){
+
   showMessage("❤️ Vida cheia!");
+
   return;
  }
 
  player.potions--;
- player.hp=Math.min(player.maxHp,player.hp+45);
 
- particle(player.x,player.y,"+45 ❤️");
+ player.hp=
+  Math.min(
+   player.maxHp,
+   player.hp+45
+  );
+
+ particle(
+  player.x,
+  player.y,
+  "+45 ❤️"
+ );
+}
+
+/* ================= FULLSCREEN ================= */
+
+async function enterFullscreen(){
+
+ try{
+
+  if(!document.fullscreenElement&&
+     document.documentElement.requestFullscreen){
+
+   await document.documentElement.requestFullscreen();
+  }
+
+ }catch(e){}
 }
 
 /* ================= JOGO ================= */
 
 function startGame(){
+
+ enterFullscreen();
 
  document.getElementById("menu").style.display="none";
  document.getElementById("gameOver").style.display="none";
@@ -903,9 +1227,11 @@ function startGame(){
 
  player.hp=c.maxHp;
  player.maxHp=c.maxHp;
+
  player.level=1;
  player.xp=0;
  player.nextXP=50;
+
  player.attack=c.attack;
  player.defense=0;
  player.speed=c.speed;
@@ -919,21 +1245,28 @@ function startGame(){
 
  wave=1;
  waveTransition=false;
+ waveTimer=0;
+
  playing=true;
 
  startWave();
 
  lastTime=performance.now();
+
  requestAnimationFrame(gameLoop);
 }
 
 document.getElementById("playButton").addEventListener("pointerdown",e=>{
+
  e.preventDefault();
+
  startGame();
 });
 
 document.getElementById("restartButton").addEventListener("pointerdown",e=>{
+
  e.preventDefault();
+
  startGame();
 });
 
@@ -950,7 +1283,10 @@ function startWave(){
   createEnemy();
  }
 
- showMessage("🌊 Horda "+wave+" começou!");
+ showMessage(
+  "🌊 Horda "+wave+" começou!"
+ );
+
  updateHUD();
 }
 
@@ -959,18 +1295,39 @@ function startWave(){
 function createEnemy(){
 
  const angle=Math.random()*Math.PI*2;
- const distance=Math.max(W,H)*.55+Math.random()*180;
+
+ /*
+  * Agora os monstros aparecem mais perto.
+  * Isso evita que o jogador fique esperando
+  * muito tempo até eles entrarem na tela.
+  */
+ const distance=
+  Math.max(W,H)*.38+
+  Math.random()*100;
 
  let type="slime";
 
- if(player.level>=5&&Math.random()<.4)type="orc";
- if(player.level>=10&&Math.random()<.3)type="demon";
+ if(
+  player.level>=5&&
+  Math.random()<.4
+ ){
+  type="orc";
+ }
+
+ if(
+  player.level>=10&&
+  Math.random()<.3
+ ){
+  type="demon";
+ }
 
  /*
-  * O CHEFE ORC aparece obrigatoriamente
-  * na horda 25.
+  * Chefe obrigatório na horda 25.
   */
- if(wave===25&&enemies.length===0){
+ if(
+  wave===25&&
+  enemies.length===0
+ ){
   type="orcBoss";
  }
 
@@ -990,44 +1347,84 @@ function createEnemy(){
  };
 
  if(type==="slime"){
-  enemy.maxHp=Math.floor(30+wave*12);
+
+  enemy.maxHp=
+   Math.floor(
+    30+wave*12
+   );
+
   enemy.hp=enemy.maxHp;
-  enemy.speed=1+wave*.025;
-  enemy.damage=4+wave;
-  enemy.xp=15+wave*4;
+
+  enemy.speed=
+   1+wave*.025;
+
+  enemy.damage=
+   4+wave;
+
+  enemy.xp=
+   15+wave*4;
+
   enemy.color="#8e44ad";
   enemy.name="Slime";
  }
 
  if(type==="orc"){
+
   enemy.size=38;
-  enemy.maxHp=Math.floor(90+wave*25);
+
+  enemy.maxHp=
+   Math.floor(
+    90+wave*25
+   );
+
   enemy.hp=enemy.maxHp;
+
   enemy.speed=.75;
-  enemy.damage=8+wave*2;
-  enemy.xp=35+wave*5;
+
+  enemy.damage=
+   8+wave*2;
+
+  enemy.xp=
+   35+wave*5;
+
   enemy.color="#557a3e";
   enemy.name="Orc";
  }
 
  if(type==="demon"){
+
   enemy.size=45;
-  enemy.maxHp=Math.floor(170+wave*40);
+
+  enemy.maxHp=
+   Math.floor(
+    170+wave*40
+   );
+
   enemy.hp=enemy.maxHp;
+
   enemy.speed=1.05;
-  enemy.damage=13+wave*2;
-  enemy.xp=70+wave*8;
+
+  enemy.damage=
+   13+wave*2;
+
+  enemy.xp=
+   70+wave*8;
+
   enemy.color="#c0392b";
   enemy.name="Demônio";
  }
 
  if(type==="orcBoss"){
+
   enemy.size=82;
+
   enemy.maxHp=1800;
   enemy.hp=1800;
+
   enemy.speed=.55;
   enemy.damage=28;
   enemy.xp=600;
+
   enemy.color="#254b20";
   enemy.name="👑 CHEFE ORC";
  }
@@ -1041,18 +1438,29 @@ function gainXP(amount){
 
  player.xp+=amount;
 
- while(player.xp>=player.nextXP){
+ while(
+  player.xp>=player.nextXP
+ ){
 
   player.xp-=player.nextXP;
+
   player.level++;
 
-  player.nextXP=Math.floor(player.nextXP*1.45);
+  player.nextXP=
+   Math.floor(
+    player.nextXP*1.45
+   );
 
   player.maxHp+=15;
   player.hp=player.maxHp;
   player.attack+=3;
 
-  particle(player.x,player.y,"⬆️ NÍVEL "+player.level);
+  particle(
+   player.x,
+   player.y,
+   "⬆️ NÍVEL "+
+   player.level
+  );
  }
 }
 
@@ -1064,14 +1472,31 @@ function specialItems(delta){
 
  if(garlic>0){
 
-  const radius=100+garlic*15;
+  const radius=
+   100+garlic*15;
 
   ctx.beginPath();
-  ctx.arc(player.x,player.y,radius,0,Math.PI*2);
-  ctx.fillStyle="rgba(50,200,70,.16)";
+
+  ctx.arc(
+   player.x,
+   player.y,
+   radius,
+   0,
+   Math.PI*2
+  );
+
+  ctx.fillStyle=
+   "rgba(50,200,70,.16)";
+
   ctx.fill();
 
-  for(const enemy of enemies){
+  for(
+   let i=enemies.length-1;
+   i>=0;
+   i--
+  ){
+
+   const enemy=enemies[i];
 
    const d=Math.hypot(
     player.x-enemy.x,
@@ -1080,14 +1505,19 @@ function specialItems(delta){
 
    if(d<=radius){
 
-    enemy.hp-=garlic*0.06*delta;
+    enemy.hp-=
+     garlic*.06*delta;
 
     if(enemy.hp<=0){
-     createDrop(enemy.x,enemy.y);
+
+     createDrop(
+      enemy.x,
+      enemy.y
+     );
+
      gainXP(enemy.xp);
 
-     const index=enemies.indexOf(enemy);
-     if(index>=0)enemies.splice(index,1);
+     enemies.splice(i,1);
     }
    }
   }
@@ -1103,24 +1533,53 @@ function specialItems(delta){
     performance.now()/500+
     i*(Math.PI*2/bible);
 
-   const bx=player.x+Math.cos(angle)*(60+i*8);
-   const by=player.y+Math.sin(angle)*(60+i*8);
+   const bx=
+    player.x+
+    Math.cos(angle)*
+    (60+i*8);
+
+   const by=
+    player.y+
+    Math.sin(angle)*
+    (60+i*8);
 
    ctx.font="25px Arial";
    ctx.textAlign="center";
-   ctx.fillText("📖",bx,by);
+
+   ctx.fillText(
+    "📖",
+    bx,
+    by
+   );
 
    for(const enemy of enemies){
 
-    if(Math.hypot(enemy.x-bx,enemy.y-by)<enemy.size/2+14){
+    if(
+     Math.hypot(
+      enemy.x-bx,
+      enemy.y-by
+     )<
+     enemy.size/2+14
+    ){
 
-     if(!enemy.bookHitCooldown)enemy.bookHitCooldown=0;
+     if(
+      !enemy.bookHitCooldown
+     )
+      enemy.bookHitCooldown=0;
 
-     if(enemy.bookHitCooldown<=0){
+     if(
+      enemy.bookHitCooldown<=0
+     ){
 
       enemy.hp-=5;
+
       enemy.bookHitCooldown=30;
-      particle(enemy.x,enemy.y,"-5");
+
+      particle(
+       enemy.x,
+       enemy.y,
+       "-5"
+      );
      }
     }
 
@@ -1130,31 +1589,50 @@ function specialItems(delta){
   }
  }
 
- /* Meteoros */
-
  if(countItem("meteor")>0){
 
-  if(Math.random()<0.012*delta){
+  if(
+   Math.random()<
+   .012*delta
+  ){
 
    const x=Math.random()*W;
    const y=Math.random()*H;
 
    particles.push({
-    x:x,y:y,
+    x:x,
+    y:y,
     life:70,
     text:"☄️",
     meteor:true,
     radius:45
    });
 
-   for(const enemy of enemies){
+   for(
+    let i=enemies.length-1;
+    i>=0;
+    i--
+   ){
 
-    if(Math.hypot(enemy.x-x,enemy.y-y)<45){
-     damageEnemy(enemy,25);
+    const enemy=enemies[i];
+
+    if(
+     Math.hypot(
+      enemy.x-x,
+      enemy.y-y
+     )<45
+    ){
+
+     damageEnemy(
+      enemy,
+      25
+     );
     }
    }
 
-   showMessage("☄️ METEORO!");
+   showMessage(
+    "☄️ METEORO!"
+   );
   }
  }
 }
@@ -1169,51 +1647,98 @@ function update(delta){
 
   waveTimer-=delta;
 
-  if(waveTimer<=0)nextWave();
+  if(waveTimer<=0)
+   nextWave();
 
   updateHUD();
+
   return;
  }
 
- player.x+=joyX*player.speed*delta;
- player.y+=joyY*player.speed*delta;
+ player.x+=
+  joyX*
+  player.speed*
+  delta;
 
- player.x=Math.max(25,Math.min(W-25,player.x));
- player.y=Math.max(35,Math.min(H-25,player.y));
+ player.y+=
+  joyY*
+  player.speed*
+  delta;
+
+ player.x=
+  Math.max(
+   25,
+   Math.min(
+    W-25,
+    player.x
+   )
+  );
+
+ player.y=
+  Math.max(
+   35,
+   Math.min(
+    H-25,
+    player.y
+   )
+  );
 
  if(player.attackCooldown>0)
   player.attackCooldown-=delta;
 
  for(const enemy of enemies){
 
-  const dx=player.x-enemy.x;
-  const dy=player.y-enemy.y;
-  const distance=Math.hypot(dx,dy);
+  const dx=
+   player.x-enemy.x;
+
+  const dy=
+   player.y-enemy.y;
+
+  const distance=
+   Math.hypot(dx,dy);
 
   if(distance>45){
 
    if(distance>0){
-    enemy.x+=dx/distance*enemy.speed*delta;
-    enemy.y+=dy/distance*enemy.speed*delta;
+
+    enemy.x+=
+     dx/distance*
+     enemy.speed*
+     delta;
+
+    enemy.y+=
+     dy/distance*
+     enemy.speed*
+     delta;
    }
 
   }else{
 
    if(enemy.cooldown<=0){
 
-    const damage=Math.max(
-     1,
-     enemy.damage-player.defense
-    );
+    const damage=
+     Math.max(
+      1,
+      enemy.damage-
+      player.defense
+     );
 
     player.hp-=damage;
+
     enemy.cooldown=50;
 
-    particle(player.x,player.y,"-"+damage);
+    particle(
+     player.x,
+     player.y,
+     "-"+damage
+    );
 
     if(player.hp<=0){
+
      player.hp=0;
+
      endGame();
+
      return;
     }
    }
@@ -1223,20 +1748,30 @@ function update(delta){
    enemy.cooldown-=delta;
  }
 
- for(let i=drops.length-1;i>=0;i--){
+ for(
+  let i=drops.length-1;
+  i>=0;
+  i--
+ ){
 
   const drop=drops[i];
 
   drop.life-=delta;
 
-  const distance=Math.hypot(
-   player.x-drop.x,
-   player.y-drop.y
-  );
+  const distance=
+   Math.hypot(
+    player.x-drop.x,
+    player.y-drop.y
+   );
 
   if(distance<38){
-   collectItem(drop.item);
+
+   collectItem(
+    drop.item
+   );
+
    drops.splice(i,1);
+
    continue;
   }
 
@@ -1249,29 +1784,46 @@ function update(delta){
  for(const p of particles){
 
   if(p.magic){
+
    p.x+=p.vx*delta;
    p.y+=p.vy*delta;
 
    for(const enemy of enemies){
 
-    if(Math.hypot(enemy.x-p.x,enemy.y-p.y)<enemy.size/2+10){
+    if(
+     Math.hypot(
+      enemy.x-p.x,
+      enemy.y-p.y
+     )<
+     enemy.size/2+10
+    ){
 
-     damageEnemy(enemy,characters.Josef.attack);
+     damageEnemy(
+      enemy,
+      characters.Josef.attack
+     );
+
      p.life=0;
+
      break;
     }
    }
 
   }else if(!p.meteor){
+
    p.y-=.5*delta;
   }
 
   p.life-=delta;
  }
 
- particles=particles.filter(p=>p.life>0);
+ particles=
+  particles.filter(
+   p=>p.life>0
+  );
 
  updateHUD();
+
  checkWaveClear();
 }
 
@@ -1279,43 +1831,59 @@ function update(delta){
 
 function checkWaveClear(){
 
- if(!playing||waveTransition)return;
+ if(
+  !playing||
+  waveTransition
+ )return;
 
  if(enemies.length===0){
 
   waveTransition=true;
   waveTimer=180;
 
-  document.getElementById("waveTitle").textContent=
-   "🌊 HORDA "+wave+" LIMPA!";
+  document.getElementById(
+   "waveTitle"
+  ).textContent=
+   "🌊 HORDA "+
+   wave+
+   " LIMPA!";
 
-  document.getElementById("waveScreen").style.display="flex";
+  document.getElementById(
+   "waveScreen"
+  ).style.display="flex";
 
-  if(wave>=5)saveData.wave5=true;
+  if(wave>=5)
+   saveData.wave5=true;
+
   if(wave>=10){
+
    saveData.wave10=true;
+
    characters.Alicia.unlocked=true;
   }
 
-  localStorage.setItem(
-   "reinoSombrioSave",
-   JSON.stringify(saveData)
-  );
+  saveGame();
  }
 }
 
 function nextWave(){
 
  wave++;
+
  waveTransition=false;
 
- document.getElementById("waveScreen").style.display="none";
+ document.getElementById(
+  "waveScreen"
+ ).style.display="none";
 
- player.hp=Math.min(player.maxHp,player.hp+25);
+ player.hp=
+  Math.min(
+   player.maxHp,
+   player.hp+25
+  );
 
- if(wave%3===0){
+ if(wave%3===0)
   player.potions++;
- }
 
  startWave();
 }
@@ -1325,106 +1893,259 @@ function nextWave(){
 function drawMap(){
 
  ctx.fillStyle="#397044";
- ctx.fillRect(0,0,W,H);
 
- for(let x=0;x<W;x+=40){
-  for(let y=0;y<H;y+=40){
+ ctx.fillRect(
+  0,
+  0,
+  W,
+  H
+ );
+
+ for(
+  let x=0;
+  x<W;
+  x+=40
+ ){
+
+  for(
+   let y=0;
+   y<H;
+   y+=40
+  ){
 
    ctx.fillStyle=
-    ((x/40+y/40)%2===0)
+    (
+     (x/40+y/40)%2===0
+    )
     ?"#3f7849"
     :"#397044";
 
-   ctx.fillRect(x,y,40,40);
+   ctx.fillRect(
+    x,
+    y,
+    40,
+    40
+   );
   }
  }
 
  ctx.fillStyle="#96734c";
 
- ctx.fillRect(0,H/2-30,W,60);
- ctx.fillRect(W/2-30,0,60,H);
+ ctx.fillRect(
+  0,
+  H/2-30,
+  W,
+  60
+ );
+
+ ctx.fillRect(
+  W/2-30,
+  0,
+  60,
+  H
+ );
 }
 
 /* ================= PLAYER ================= */
 
 function drawPlayer(){
 
- ctx.fillStyle="rgba(0,0,0,.4)";
+ ctx.fillStyle=
+  "rgba(0,0,0,.4)";
+
  ctx.beginPath();
- ctx.arc(player.x,player.y+17,15,0,Math.PI*2);
+
+ ctx.arc(
+  player.x,
+  player.y+17,
+  15,
+  0,
+  Math.PI*2
+ );
+
  ctx.fill();
 
  if(selectedCharacter==="Josef"){
 
   ctx.fillStyle="#3949ab";
-  ctx.fillRect(player.x-15,player.y-5,30,28);
+
+  ctx.fillRect(
+   player.x-15,
+   player.y-5,
+   30,
+   28
+  );
 
   ctx.fillStyle="#f0bd7a";
+
   ctx.beginPath();
-  ctx.arc(player.x,player.y-14,12,0,Math.PI*2);
+
+  ctx.arc(
+   player.x,
+   player.y-14,
+   12,
+   0,
+   Math.PI*2
+  );
+
   ctx.fill();
 
   ctx.fillStyle="#24145c";
+
   ctx.beginPath();
-  ctx.arc(player.x,player.y-18,11,Math.PI,Math.PI*2);
+
+  ctx.arc(
+   player.x,
+   player.y-18,
+   11,
+   Math.PI,
+   Math.PI*2
+  );
+
   ctx.fill();
 
   ctx.strokeStyle="#7ec8ff";
   ctx.lineWidth=5;
+
   ctx.beginPath();
-  ctx.moveTo(player.x+12,player.y+5);
-  ctx.lineTo(player.x+30,player.y-24);
+
+  ctx.moveTo(
+   player.x+12,
+   player.y+5
+  );
+
+  ctx.lineTo(
+   player.x+30,
+   player.y-24
+  );
+
   ctx.stroke();
 
  }else if(selectedCharacter==="Alicia"){
 
   ctx.fillStyle="#bd3048";
-  ctx.fillRect(player.x-15,player.y-5,30,28);
+
+  ctx.fillRect(
+   player.x-15,
+   player.y-5,
+   30,
+   28
+  );
 
   ctx.fillStyle="#f0bd7a";
+
   ctx.beginPath();
-  ctx.arc(player.x,player.y-14,12,0,Math.PI*2);
+
+  ctx.arc(
+   player.x,
+   player.y-14,
+   12,
+   0,
+   Math.PI*2
+  );
+
   ctx.fill();
 
   ctx.fillStyle="#6b3820";
+
   ctx.beginPath();
-  ctx.arc(player.x,player.y-18,11,Math.PI,Math.PI*2);
+
+  ctx.arc(
+   player.x,
+   player.y-18,
+   11,
+   Math.PI,
+   Math.PI*2
+  );
+
   ctx.fill();
 
   ctx.strokeStyle="#fff";
   ctx.lineWidth=6;
+
   ctx.beginPath();
-  ctx.moveTo(player.x+10,player.y+3);
-  ctx.lineTo(player.x+35,player.y-25);
+
+  ctx.moveTo(
+   player.x+10,
+   player.y+3
+  );
+
+  ctx.lineTo(
+   player.x+35,
+   player.y-25
+  );
+
   ctx.stroke();
 
  }else{
 
   ctx.fillStyle="#2474b5";
-  ctx.fillRect(player.x-15,player.y-5,30,28);
+
+  ctx.fillRect(
+   player.x-15,
+   player.y-5,
+   30,
+   28
+  );
 
   ctx.fillStyle="#f0bd7a";
+
   ctx.beginPath();
-  ctx.arc(player.x,player.y-14,12,0,Math.PI*2);
+
+  ctx.arc(
+   player.x,
+   player.y-14,
+   12,
+   0,
+   Math.PI*2
+  );
+
   ctx.fill();
 
   ctx.fillStyle="#392318";
+
   ctx.beginPath();
-  ctx.arc(player.x,player.y-18,11,Math.PI,Math.PI*2);
+
+  ctx.arc(
+   player.x,
+   player.y-18,
+   11,
+   Math.PI,
+   Math.PI*2
+  );
+
   ctx.fill();
 
   ctx.strokeStyle="#eee";
   ctx.lineWidth=5;
+
   ctx.beginPath();
-  ctx.moveTo(player.x+10,player.y+3);
-  ctx.lineTo(player.x+30,player.y-22);
+
+  ctx.moveTo(
+   player.x+10,
+   player.y+3
+  );
+
+  ctx.lineTo(
+   player.x+30,
+   player.y-22
+  );
+
   ctx.stroke();
  }
 
  ctx.fillStyle="#fff";
- ctx.font="bold 11px Arial";
+
+ ctx.font=
+  "bold 11px Arial";
+
  ctx.textAlign="center";
- ctx.fillText("LV "+player.level,player.x,player.y+40);
+
+ ctx.fillText(
+  "LV "+player.level,
+  player.x,
+  player.y+40
+ );
 }
 
 /* ================= INIMIGOS ================= */
@@ -1433,77 +2154,190 @@ function drawEnemies(){
 
  for(const enemy of enemies){
 
-  ctx.fillStyle="rgba(0,0,0,.4)";
+  ctx.fillStyle=
+   "rgba(0,0,0,.4)";
+
   ctx.beginPath();
+
   ctx.arc(
    enemy.x,
-   enemy.y+enemy.size*.45,
+   enemy.y+
+   enemy.size*.45,
    enemy.size*.45,
    0,
    Math.PI*2
   );
+
   ctx.fill();
 
   ctx.fillStyle=enemy.color;
+
   ctx.beginPath();
-  ctx.arc(enemy.x,enemy.y,enemy.size/2,0,Math.PI*2);
+
+  ctx.arc(
+   enemy.x,
+   enemy.y,
+   enemy.size/2,
+   0,
+   Math.PI*2
+  );
+
   ctx.fill();
+
+  /*
+   * OLHOS
+   */
 
   ctx.fillStyle="#fff";
 
   ctx.beginPath();
+
   ctx.arc(
-   enemy.x-enemy.size*.2,
-   enemy.y-enemy.size*.08,
-   5,0,Math.PI*2
+   enemy.x-
+   enemy.size*.2,
+   enemy.y-
+   enemy.size*.08,
+   5,
+   0,
+   Math.PI*2
   );
+
   ctx.fill();
 
   ctx.beginPath();
+
   ctx.arc(
-   enemy.x+enemy.size*.2,
-   enemy.y-enemy.size*.08,
-   5,0,Math.PI*2
+   enemy.x+
+   enemy.size*.2,
+   enemy.y-
+   enemy.size*.08,
+   5,
+   0,
+   Math.PI*2
   );
+
   ctx.fill();
 
-  const barWidth=Math.max(60,enemy.size*1.7);
-  const barY=enemy.y-enemy.size/2-25;
-  const barX=enemy.x-barWidth/2;
+  /*
+   * BARRA DE HP
+   */
 
-  ctx.fillStyle="#111";
-  ctx.fillRect(barX,barY,barWidth,enemy.type==="orcBoss"?10:7);
+  const isBoss=
+   enemy.type==="orcBoss";
 
-  ctx.fillStyle=enemy.type==="orcBoss"?"#ff1744":"#39d353";
+  const barWidth=
+   isBoss
+   ?Math.max(140,enemy.size*2.4)
+   :Math.max(70,enemy.size*1.8);
+
+  const barHeight=
+   isBoss
+   ?12
+   :8;
+
+  const barY=
+   enemy.y-
+   enemy.size/2-
+   (isBoss?43:28);
+
+  const barX=
+   enemy.x-
+   barWidth/2;
+
+  /*
+   * FUNDO DA BARRA
+   */
+
+  ctx.fillStyle="#160606";
+
   ctx.fillRect(
    barX,
    barY,
-   barWidth*Math.max(0,enemy.hp/enemy.maxHp),
-   enemy.type==="orcBoss"?10:7
+   barWidth,
+   barHeight
   );
 
-ctx.fillStyle="#fff";
-ctx.font="bold 10px Arial";
-ctx.textAlign="center";
+  /*
+   * VIDA
+   */
 
-ctx.fillText(
-    Math.ceil(enemy.hp)+" / "+Math.ceil(enemy.maxHp),
-    enemy.x,
-    barY-4
-);
-  
-  if(enemy.type!=="slime"){
-
-   ctx.fillStyle="#fff";
-   ctx.font="bold 11px Arial";
-   ctx.textAlign="center";
-
-   ctx.fillText(
-    enemy.name,
-    enemy.x,
-    barY-7
+  const hpPercent=
+   Math.max(
+    0,
+    Math.min(
+     1,
+     enemy.hp/enemy.maxHp
+    )
    );
-  }
+
+  ctx.fillStyle=
+   isBoss
+   ?" #ff1744".trim()
+   :"#39d353";
+
+  ctx.fillRect(
+   barX,
+   barY,
+   barWidth*hpPercent,
+   barHeight
+  );
+
+  /*
+   * BORDA
+   */
+
+  ctx.strokeStyle=
+   isBoss
+   ?" #fff".trim()
+   :"rgba(255,255,255,.55)";
+
+  ctx.lineWidth=
+   isBoss?2:1;
+
+  ctx.strokeRect(
+   barX,
+   barY,
+   barWidth,
+   barHeight
+  );
+
+  /*
+   * NOME
+   */
+
+  ctx.fillStyle="#fff";
+
+  ctx.font=
+   isBoss
+   ?"bold 14px Arial"
+   :"bold 11px Arial";
+
+  ctx.textAlign="center";
+
+  ctx.fillText(
+   enemy.name,
+   enemy.x,
+   barY-7
+  );
+
+  /*
+   * HP NUMÉRICO
+   */
+
+  ctx.font=
+   isBoss
+   ?"bold 12px Arial"
+   :"bold 10px Arial";
+
+  ctx.fillText(
+   Math.ceil(enemy.hp)+
+   " / "+
+   enemy.maxHp,
+   enemy.x,
+   barY+
+   barHeight+
+   (isBoss?15:13)
+  );
  }
 }
 
@@ -1516,7 +2350,15 @@ function drawDrops(){
   ctx.fillStyle="#ffd54f";
 
   ctx.beginPath();
-  ctx.arc(drop.x,drop.y,17,0,Math.PI*2);
+
+  ctx.arc(
+   drop.x,
+   drop.y,
+   17,
+   0,
+   Math.PI*2
+  );
+
   ctx.fill();
 
   ctx.font="23px Arial";
@@ -1550,31 +2392,60 @@ function drawParticles(){
 
    ctx.font="25px Arial";
    ctx.textAlign="center";
-   ctx.fillText("🔵",p.x,p.y);
+
+   ctx.fillText(
+    "🔵",
+    p.x,
+    p.y
+   );
 
   }else if(p.meteor){
 
-   ctx.globalAlpha=p.life/70;
+   ctx.globalAlpha=
+    p.life/70;
 
-   ctx.fillStyle="rgba(255,100,20,.25)";
+   ctx.fillStyle=
+    "rgba(255,100,20,.25)";
+
    ctx.beginPath();
-   ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+
+   ctx.arc(
+    p.x,
+    p.y,
+    p.radius,
+    0,
+    Math.PI*2
+   );
+
    ctx.fill();
 
    ctx.font="40px Arial";
-   ctx.fillText("☄️",p.x,p.y);
+
+   ctx.fillText(
+    "☄️",
+    p.x,
+    p.y
+   );
 
    ctx.globalAlpha=1;
 
   }else{
 
-   ctx.globalAlpha=p.life/60;
+   ctx.globalAlpha=
+    p.life/60;
 
    ctx.fillStyle="#fff";
-   ctx.font="bold 16px Arial";
+
+   ctx.font=
+    "bold 16px Arial";
+
    ctx.textAlign="center";
 
-   ctx.fillText(p.text,p.x,p.y);
+   ctx.fillText(
+    p.text,
+    p.x,
+    p.y
+   );
 
    ctx.globalAlpha=1;
   }
@@ -1585,32 +2456,100 @@ function drawParticles(){
 
 function updateHUD(){
 
- document.getElementById("levelText").textContent=
-  "⚔️ Nível "+player.level;
+ document.getElementById(
+  "levelText"
+ ).textContent=
+  "⚔️ Nível "+
+  player.level;
 
- document.getElementById("attackText").textContent=
+ document.getElementById(
+  "attackText"
+ ).textContent=
   player.attack;
 
- document.getElementById("defenseText").textContent=
+ document.getElementById(
+  "defenseText"
+ ).textContent=
   player.defense;
 
- document.getElementById("potionText").textContent=
+ document.getElementById(
+  "potionText"
+ ).textContent=
   player.potions;
 
- document.getElementById("characterText").textContent=
-  characters[selectedCharacter].name;
+ document.getElementById(
+  "characterText"
+ ).textContent=
+  characters[
+   selectedCharacter
+  ].name;
 
- document.getElementById("waveText").textContent=
-  "🌊 Horda "+wave;
+ document.getElementById(
+  "waveText"
+ ).textContent=
+  "🌊 Horda "+
+  wave;
 
- document.getElementById("enemyCount").textContent=
+ document.getElementById(
+  "enemyCount"
+ ).textContent=
   enemies.length;
 
- document.getElementById("hpBar").style.width=
-  Math.max(0,player.hp/player.maxHp*100)+"%";
+ document.getElementById(
+  "hpBar"
+ ).style.width=
+  Math.max(
+   0,
+   player.hp/
+   player.maxHp*
+   100
+  )+"%";
 
- document.getElementById("xpBar").style.width=
-  Math.max(0,player.xp/player.nextXP*100)+"%";
+ document.getElementById(
+  "xpBar"
+ ).style.width=
+  Math.max(
+   0,
+   player.xp/
+   player.nextXP*
+   100
+  )+"%";
+
+ const boss=
+  enemies.find(
+   e=>e.type==="orcBoss"
+  );
+
+ const bossHud=
+  document.getElementById(
+   "bossHud"
+  );
+
+ if(boss){
+
+  bossHud.style.display="block";
+
+  document.getElementById(
+   "bossHp"
+  ).style.width=
+   Math.max(
+    0,
+    boss.hp/
+    boss.maxHp*
+    100
+   )+"%";
+
+  document.getElementById(
+   "bossHpText"
+  ).textContent=
+   Math.ceil(boss.hp)+
+   " / "+
+   boss.maxHp;
+
+ }else{
+
+  bossHud.style.display="none";
+ }
 }
 
 /* ================= MENSAGEM ================= */
@@ -1619,16 +2558,23 @@ let messageTimeout=null;
 
 function showMessage(text){
 
- const message=document.getElementById("message");
+ const message=
+  document.getElementById(
+   "message"
+  );
 
  message.textContent=text;
 
  if(messageTimeout!==null)
   clearTimeout(messageTimeout);
 
- messageTimeout=setTimeout(()=>{
-  message.textContent="⚔️ Derrote todos os monstros!";
- },2200);
+ messageTimeout=
+  setTimeout(()=>{
+
+   message.textContent=
+    "⚔️ Derrote todos os monstros!";
+
+  },2200);
 }
 
 /* ================= GAME OVER ================= */
@@ -1637,10 +2583,21 @@ function endGame(){
 
  playing=false;
 
- document.getElementById("result").textContent=
-  "Nível "+player.level+" • Horda "+wave;
+ saveGame();
 
- document.getElementById("gameOver").style.display="flex";
+ document.getElementById(
+  "result"
+ ).textContent=
+  "Nível "+
+  player.level+
+  " • Horda "+
+  wave;
+
+ document.getElementById(
+  "gameOver"
+ ).style.display="flex";
+
+ updateHUD();
 }
 
 /* ================= DRAW ================= */
@@ -1648,10 +2605,15 @@ function endGame(){
 function draw(){
 
  drawMap();
+
  specialItems(0);
+
  drawDrops();
+
  drawEnemies();
+
  drawPlayer();
+
  drawParticles();
 }
 
@@ -1662,49 +2624,64 @@ let lastTime=performance.now();
 function gameLoop(time){
 
  if(!playing){
+
   draw();
+
   return;
  }
 
- let delta=(time-lastTime)/16.67;
+ let delta=
+  (time-lastTime)/16.67;
 
- if(!Number.isFinite(delta))delta=1;
- if(delta>2)delta=2;
- if(delta<0)delta=1;
+ if(!Number.isFinite(delta))
+  delta=1;
+
+ if(delta>2)
+  delta=2;
+
+ if(delta<0)
+  delta=1;
 
  lastTime=time;
 
  update(delta);
+
  draw();
 
- requestAnimationFrame(gameLoop);
+ requestAnimationFrame(
+  gameLoop
+ );
 }
 
-/* ================= INVENTÁRIO ================= */
-
-document.getElementById("inventoryButton").addEventListener("pointerdown",e=>{
- e.preventDefault();
-
- renderInventory();
- openPanel("inventory");
-});
-
-/* ================= INÍCIO ================= */
+/* ================= SERVICE WORKER ================= */
 
 if("serviceWorker" in navigator){
 
- window.addEventListener("load",()=>{
-  navigator.serviceWorker.register(
-   "./service-worker.js"
-  ).catch(error=>console.log(error));
- });
+ window.addEventListener(
+  "load",
+  ()=>{
+
+   navigator.serviceWorker.register(
+    "./service-worker.js"
+   ).catch(
+    error=>console.log(error)
+   );
+
+  }
+ );
 }
+
+/* ================= INÍCIO ================= */
+
+resize();
 
 renderCharacters();
 renderMissions();
+
 draw();
 updateHUD();
 
 </script>
+
 </body>
 </html>

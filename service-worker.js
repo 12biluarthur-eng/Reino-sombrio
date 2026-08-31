@@ -34,6 +34,10 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
 
+    if(event.request.method !== "GET"){
+        return;
+    }
+
     event.respondWith(
 
         caches.match(event.request)
@@ -46,7 +50,14 @@ self.addEventListener("fetch", event => {
                 return fetch(event.request)
                     .then(response => {
 
-                        const copy = response.clone();
+                        if(
+                            !response ||
+                            response.status !== 200
+                        ){
+                            return response;
+                        }
+
+                        const copy=response.clone();
 
                         caches.open(CACHE_NAME)
                             .then(cache =>
